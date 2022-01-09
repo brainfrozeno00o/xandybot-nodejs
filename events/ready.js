@@ -1,3 +1,8 @@
+const fs = require("fs");
+
+// handling tasks here
+const taskFiles = fs.readdirSync("./tasks").filter(file => file.endsWith(".js"));
+
 module.exports = {
   name: "ready",
   once: true,
@@ -13,5 +18,12 @@ module.exports = {
       ],
       status: "online",
     });
+
+    // executing tasks here
+    for (const file of taskFiles) {
+      const task = require(`../tasks/${file}`);
+      console.info(`Setting up task: ${task.name}`);
+      await task.execute(client);
+    }
   },
 };

@@ -25,6 +25,7 @@ for (const file of eventFiles) {
 process.on("SIGINT", () => {
     console.debug("Bot now closing...");
     client.destroy(); // this has no delay when closing...
+    process.exit(0);
 });
 
 client.login(token);
