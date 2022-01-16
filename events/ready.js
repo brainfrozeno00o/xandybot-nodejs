@@ -24,23 +24,6 @@ module.exports = {
 
     await authenticate();
 
-    // try {
-    //   const result = await sequelize.transaction(async (t) => {
-    //     const quote = await Quote.create(
-    //       {
-    //         quote: "Test Quote",
-    //         context: "Hotdogs",
-    //       },
-    //       { transaction: t }
-    //     );
-
-    //     return quote;
-    //   });
-    //   console.info(`Created object: ${result}`);
-    // } catch (e) {
-    //   console.error(`Error while creating an object via a model: ${e}`);
-    // }
-
     // executing tasks here
     for (const file of taskFiles) {
       const task = require(`../tasks/${file}`);
