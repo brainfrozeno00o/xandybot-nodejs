@@ -1,4 +1,8 @@
-module.exports = (sequelize, DataTypes) => {
+const withDateNoTz = require("sequelize-date-no-tz-postgres");
+
+module.exports = (sequelize, SequelizeDataTypes) => {
+  const DataTypes = withDateNoTz(SequelizeDataTypes);
+
   return sequelize.define(
     "used_quotes",
     {

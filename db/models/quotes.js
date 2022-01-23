@@ -1,4 +1,8 @@
-module.exports = (sequelize, DataTypes) => {
+const withDateNoTz = require("sequelize-date-no-tz-postgres");
+
+module.exports = (sequelize, SequelizeDataTypes) => {
+  const DataTypes = withDateNoTz(SequelizeDataTypes);
+
   return sequelize.define(
     "all_quotes",
     {
@@ -16,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       date_created: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATE_NO_TZ,
         defaultValue: DataTypes.NOW,
       },
     },

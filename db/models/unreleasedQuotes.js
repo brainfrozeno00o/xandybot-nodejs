@@ -1,4 +1,8 @@
-module.exports = (sequelize, DataTypes) => {
+const withDateNoTz = require('sequelize-date-no-tz-postgres');
+
+module.exports = (sequelize, SequelizeDataTypes) => {
+  const DataTypes = withDateNoTz(SequelizeDataTypes);
+
   return sequelize.define(
     "quotes_up_for_release",
     {
@@ -21,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
+      tableName: "quotes_up_for_release", // forcing right table name here
       timestamps: false,
     }
   );

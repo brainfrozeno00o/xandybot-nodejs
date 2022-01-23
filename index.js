@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 const { Client, Intents } = require("discord.js");
 const { overrideConsole } = require("./service/logger");
 const { close } = require("./db/sequelize");
+const { storeQuotesUpForRelease } = require("./service/quoteService");
 const fs = require("fs");
 
 dotenv.config();
@@ -29,9 +30,15 @@ for (const file of eventFiles) {
 // handling closing, SIGINT only for now...
 process.on("SIGINT", async () => {
   console.debug("Bot now closing...");
-  await close();
-  client.destroy(); // this has no delay when closing...
-  process.exit(0);
+  try {
+    await storeQuotesUpForRelease();
+  } catch (e) {
+    console.error(`Tried storing quotes up for release but an error occurred: ${e}`);
+  } finally {
+    await close();
+    client.destroy(); // this has no delay when closing...
+    process.exit(0);
+  }
 });
 
 client.login(token);
