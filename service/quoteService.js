@@ -42,6 +42,10 @@ const setupData = async () => {
             incoming_context: quote["context"],
           };
         });
+      } else {
+        unreleasedQuotes = unreleasedQuotes.map((quote) => {
+          return quote.dataValues;
+        });
       }
       released = allQuotesLength - unreleasedQuotes.length;
       console.info(
@@ -54,6 +58,14 @@ const setupData = async () => {
 };
 
 setupData();
+
+const getNumberOfReleasedQuotes = () => {
+  return released;
+};
+
+const getNumberOfQuotesForRelease = () => {
+  return unreleasedQuotes.length;
+};
 
 const getAllQuotes = () => {
   return allQuotes;
@@ -89,25 +101,29 @@ const getRandomQuoteTask = () => {
       "All Xander quotes in the repository have been said... Resetting pool..."
     );
     unreleasedQuotes = allQuotes.map((quote) => {
-      return { ...quote };
+      return {
+        id: quote.id,
+        incoming_quote: quote["quote"],
+        incoming_context: quote["context"],
+      };
     });
   }
 
   console.info("Successfully got a random Xander quote for the task...");
-  return randomQuote;
+  return {
+    quote: randomQuote["incoming_quote"],
+    context: randomQuote["incoming_context"],
+  };
 };
 
 const storeInsertedQuote = async (quote) => {
   try {
     console.info("Inserting released quote to database...");
-    // handling apostrophes here when inserting data in PostgreSQL
-    const insertedQuote = quote["quote"].replace("'", "''");
-    const insertedContext = quote["context"].replace("'", "''");
     await sequelize.transaction(async (t) => {
       await UsedQuote.create(
         {
-          used_quote: insertedQuote,
-          used_context: insertedContext,
+          used_quote: quote["quote"],
+          used_context: quote["context"],
         },
         { transaction: t }
       );
@@ -126,17 +142,14 @@ const storeQuotesUpForRelease = async () => {
   try {
     await sequelize.transaction(async (t) => {
       await sequelize.query("DELETE FROM quotes_up_for_release", {
-        transaction: t
+        transaction: t,
       });
       // bulk create here
       const unreleasedQuotesForInsertion = unreleasedQuotes.map((quote) => {
-        // handling apostrophes here when inserting data in PostgreSQL
-        const incomingQuote = quote["incoming_quote"].replace("'", "''");
-        const incomingContext = quote["incoming_context"].replace("'", "''");
         // remove the id attribute as this is automatically set
         return {
-          incoming_quote: incomingQuote,
-          incoming_context: incomingContext,
+          incoming_quote: quote["incoming_quote"],
+          incoming_context: quote["incoming_context"],
         };
       });
       await UnreleasedQuote.bulkCreate(unreleasedQuotesForInsertion, {
@@ -153,6 +166,8 @@ const storeQuotesUpForRelease = async () => {
 };
 
 module.exports = {
+  getNumberOfReleasedQuotes,
+  getNumberOfQuotesForRelease,
   getRandomQuote,
   getRandomQuoteTask,
   getAllQuotes,
