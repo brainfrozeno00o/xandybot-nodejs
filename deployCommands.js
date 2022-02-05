@@ -20,14 +20,16 @@ for (const file of commandFiles) {
 
 const rest = new REST({ version: "9" }).setToken(token);
 
-(async () => {
-  try {
-    console.log("Started refreshing application (/) commands.");
+module.exports = {
+  async importCommands() {
+    try {
+      console.info("Started refreshing application (/) commands.");
 
-    await rest.put(Routes.applicationCommands(clientId), { body: commands });
+      await rest.put(Routes.applicationCommands(clientId), { body: commands });
 
-    console.log("Successfully reloaded application (/) commands.");
-  } catch (e) {
-    console.error(`Error in reloading application (/) commands: ${e}`);
-  }
-})();
+      console.info("Successfully reloaded application (/) commands.");
+    } catch (e) {
+      console.error(`Error in reloading application (/) commands: ${e}`);
+    }
+  },
+};
