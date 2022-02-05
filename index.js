@@ -3,7 +3,6 @@ const { Client, Intents, Collection } = require("discord.js");
 const { overrideConsole } = require("./service/logger");
 const { close } = require("./db/sequelize");
 const { storeQuotesUpForRelease } = require("./service/quoteService");
-const { importCommands } = require("./deployCommands");
 const fs = require("fs");
 
 dotenv.config();
@@ -14,9 +13,6 @@ const client = new Client({
 });
 client.commands = new Collection();
 const token = process.env.DISCORD_TOKEN;
-
-// handle refreshing commands to server
-importCommands();
 
 // handling events here
 const eventFiles = fs
