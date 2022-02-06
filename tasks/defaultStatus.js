@@ -4,6 +4,7 @@ module.exports = {
     name: "defaultStatus",
     async execute(client) {
         try {
+            // 8 AM GMT+8
             cron.schedule("0 0 * * *", async function() {
                 await client.user.setPresence({
                     activities: [

@@ -39,20 +39,35 @@ for (const file of commandFiles) {
   client.commands.set(command.data.name, command);
 }
 
-// handling closing, SIGINT only for now...
-process.on("SIGINT", async () => {
-  console.debug("Bot now closing...");
-  try {
-    await storeQuotesUpForRelease();
-  } catch (e) {
-    console.error(
-      `Tried storing quotes up for release but an error occurred: ${e}`
-    );
-  } finally {
-    await close();
-    client.destroy(); // this has no delay when closing...
-    process.exit(0);
-  }
-});
+// handling closing for the following: SIGINT, SIGTERM, SIGQUIT
+["SIGINT", "SIGTERM", "SIGQUIT"].forEach((signal) =>
+  process.on(signal, async () => {
+    console.debug(`Bot now closing on ${signal}...`);
+    try {
+      await storeQuotesUpForRelease();
+    } catch (e) {
+      console.error(
+        `Tried storing quotes up for release but an error occurred: ${e}`
+      );
+    } finally {
+      await close(); // close connection to database
+      client.destroy(); // this has no delay when closing...
+      process.exit(0);
+    }
+  })
+);
+
+/**
+ * Another implementation for above could be the following:
+ *
+ * function signalHandler() {
+ *  // do stuff here
+ *  process.exit(0);
+ * }
+ *
+ * process.on("SIGINT", signalHandler);
+ * process.on("SIGTERM", signalHandler);
+ * process.on("SIGQUIT", signalHandler);
+ */
 
 client.login(token);

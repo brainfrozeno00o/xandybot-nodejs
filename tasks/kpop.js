@@ -4,6 +4,7 @@ module.exports = {
     name: "kpop",
     async execute(client) {
         try {
+            // 1 AM GMT+8
             cron.schedule("0 17 * * *", async function() {
                 await client.user.setPresence({
                     activities: [

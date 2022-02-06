@@ -4,6 +4,7 @@ module.exports = {
     name: "genshinStatus",
     async execute(client) {
         try {
+            // 11 PM GMT+8
             cron.schedule("0 15 * * *", async function() {
                 await client.user.setPresence({
                     activities: [

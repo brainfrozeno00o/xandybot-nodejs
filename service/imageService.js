@@ -21,8 +21,6 @@ const getAllImagesFromDatabase = async () => {
   }
 };
 
-getAllImagesFromDatabase();
-
 const getAllImages = () => {
   return allImages;
 };
@@ -31,4 +29,4 @@ const getRandomImage = () => {
   return allImages[Math.floor(Math.random() * allImages.length)];
 };
 
-module.exports = { getAllImages, getRandomImage };
+module.exports = { getAllImages, getRandomImage, getAllImagesFromDatabase };

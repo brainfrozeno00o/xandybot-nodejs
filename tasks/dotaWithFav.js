@@ -4,6 +4,7 @@ module.exports = {
     name: "dotaWithFav",
     async execute(client) {
         try {
+            // 2 AM GMT+8
             cron.schedule("0 18 * * *", async function() {
                 await client.user.setPresence({
                     activities: [

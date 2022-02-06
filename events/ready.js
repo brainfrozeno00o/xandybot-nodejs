@@ -1,5 +1,7 @@
 const fs = require("fs");
-const { authenticate } = require("../db/sequelize");
+const { authenticate, syncDatabase } = require("../db/sequelize");
+const { getAllImagesFromDatabase } = require("../service/imageService");
+const { getAllQuotesFromDatabase } = require("../service/quoteService");
 
 // handling tasks here
 const taskFiles = fs
@@ -11,6 +13,7 @@ module.exports = {
   once: true,
   async execute(client) {
     console.debug("Bot now ready...");
+    // TODO: Set presence properly depending on the time the bot is deployed
     // set presence here
     await client.user.setPresence({
       activities: [
@@ -22,7 +25,12 @@ module.exports = {
       status: "online",
     });
 
+    // TODO: Check if there is a better way to initialize connection to database before the bot is ready
+    // connecting to database when bot is ready
+    await syncDatabase();
     await authenticate();
+    await getAllQuotesFromDatabase();
+    await getAllImagesFromDatabase();
 
     // executing tasks here
     for (const file of taskFiles) {

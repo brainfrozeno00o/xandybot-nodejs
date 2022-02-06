@@ -25,12 +25,15 @@ const UnreleasedQuote = require("./models/unreleasedQuotes")(
   Sequelize.DataTypes
 );
 
-sequelize
-  .sync()
-  .then(() => {
+const syncDatabase = async () => {
+  try {
+    await sequelize.sync();
     console.info("Database synced successfully!");
-  })
-  .catch((e) => console.error(`Problem in syncing database: ${e}`));
+  } catch (e) {
+    console.error(`Problem in syncing database: ${e}`);
+  }
+
+};
 
 const getInstance = () => {
   return sequelize;
@@ -58,6 +61,7 @@ module.exports = {
   authenticate,
   close,
   getInstance,
+  syncDatabase,
   Image,
   Quote,
   UnreleasedQuote,

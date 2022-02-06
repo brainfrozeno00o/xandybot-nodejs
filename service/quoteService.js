@@ -11,7 +11,7 @@ let allQuotes,
   unreleasedQuotes,
   released = 0;
 
-const setupData = async () => {
+const getAllQuotesFromDatabase = async () => {
   try {
     await sequelize.transaction(async (t) => {
       // original quotes
@@ -56,8 +56,6 @@ const setupData = async () => {
     console.error(`Error while trying to get info on quotes: ${e}`);
   }
 };
-
-setupData();
 
 const getNumberOfReleasedQuotes = () => {
   return released;
@@ -171,6 +169,7 @@ module.exports = {
   getRandomQuote,
   getRandomQuoteTask,
   getAllQuotes,
+  getAllQuotesFromDatabase,
   storeInsertedQuote,
   storeQuotesUpForRelease,
 };
