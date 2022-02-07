@@ -6,11 +6,11 @@ This Discord bot does all the shenanigans Rene Alexander S. Castillo does in rea
 
 - Bot sending a random quote every day at 8:00 AM UTC+8 to the `#general` channel of your server.
 - Bot changes its status depending on the time of day. This actually reflects on what the real Xander Castillo does on a daily basis.
-- Bot now has its own help command by running `%helphelphelp {command|alias}` where the command or alias argument is optional.
-- Bot will also give a random answer to a specific statement by running `%lgtm {statement}`
+- Bot now has its own help command by running `/helphelphelp {command}` where the command input is optional.
+- Bot will also give a random answer to a specific statement by running `/lgtm {statement}`, where the statement is required.
 - Bot does a callout `HOY @Blitz` every time SJG says something in any channel in a server where **both** the bot and SJG are present. It has a cooldown of an hour before the bot can call him out again.
-- Bot can give a random quote upon the request of a user. This **should not** affect the scheduled sending of random quotes.
-- Bot can give a random image of the real Xander Castillo.
+- Bot can give a random quote upon the request of a user by running `/clown`. This **should not** affect the scheduled sending of random quotes.
+- Bot can give a random image of the real Xander Castillo by running `/pogi`.
 
 ## Future Features
 
@@ -20,6 +20,8 @@ This Discord bot does all the shenanigans Rene Alexander S. Castillo does in rea
 
 ### Tools Required To Run Locally
 
+- [Node.js](https://nodejs.org/en/download/) - Currently using version 16.13.0
+- [npm](https://nodejs.org/en/download/) - Automatically included when installing Node.js, currently using version 8.1.0
 - [PostgreSQL](https://www.postgresql.org/download/) - any version would suffice
 - Your own Discord account - you'll have to create your own bot if you want to run this locally **OR** you can join the [XandyBot](https://discord.gg/vAtFk8n9B2) Discord server to have a development bot assigned to you
 
@@ -67,6 +69,7 @@ Please refer to the `.env.example` regarding the needed variables when running t
 | :--------------------: | ------------------------- | :----------------------:|
 | COMMON_SLEEP_TIME | Number of seconds a specific function sleeps after executing a specific function | 60 |
 | DISCORD_TOKEN | This is the token of your bot. | Refer to this [specific step](#TOKEN_STEP) or this [note](#TOKEN_NOTE)
+| DISCORD_CLIENT_ID | This is the id of your bot. This is needed when refreshing commands. | Refer to this [specific step](#TOKEN_STEP) or this [note](#TOKEN_NOTE)
 | XANDER_IMAGE | Any link to an image that is used in the embed for the scheduled sending of the quote | [Copy link address](https://media.discordapp.net/attachments/360409354949754881/891605505766727680/dtPI6VG.png?width=350&height=450)
 | XANDER_IMAGE_2 | Any link to an image that is used in the embed for sending a random quote at the user's will | [Copy link address](https://media.discordapp.net/attachments/893759325393289256/901420249101008936/NGVL7394.JPG?width=350&height=450)
 | XANDY_LOG_CHANNEL_ID | A specific channel ID on where the bot can send its logs | Find [here](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-#:~:text=On%20Android%20press%20and%20hold,name%20and%20select%20Copy%20ID.) on how to get a channel ID.
@@ -79,8 +82,23 @@ Please refer to the `.env.example` regarding the needed variables when running t
 | DB_SERVER | The server on where the database is hosted | localhost
 | DB | The name of the database | xdy_bot
 
-### Setting Up The Virtual Environment and Running the Bot Locally
+### Setting Up Local Environment and Running the Bot for the First Time
 
-TBD for now since new language is being used
+**NOTE**: Once npm is installed in your local machine, please ensure that you can run it via command line and it is fully configured. This is because the steps found in this README will make full use of the command line.
+
+1. Clone this repository in a specific folder.
+2. Open the command line and point to the working directory to the specific folder where the project is located (e.g. `cd xandy-bot`)
+3. Run `npm install` to install all the needed packages to run this bot.
+4. **IF THERE IS COMPLETELY NO DATA AND TABLES IN YOUR DATABASE**, you can opt to run `npm run migrate` first to execute the migration script
+5. To register the slash commands for your bot, run `npm run refreshcommands`
+6. To finally run the bot, run `node .`
+7. If you want to run all the scripts from steps 4-6 (just make sure you meet the prerequisite for step 4), run `npm run all-run`
+8. To stop it from running, just basically press <kbd>Ctrl</kbd>+<kbd>C</kbd> (or <kbd>⌘</kbd>+<kbd>C</kbd> if on Mac)
+
+### Running the Bot for the Second Time (and onwards)
+
+1. If there are no updates needed, just run using `node .`
+2. If the commands are updated or there are new commands developed for the bot, you can opt to run `npm run refreshcommands` first or you can execute the scripts succesfully by running `npm run refreshcommands-run`
+3. To stop it from running, just basically press <kbd>Ctrl</kbd>+<kbd>C</kbd> (or <kbd>⌘</kbd>+<kbd>C</kbd> if on Mac)
 
 [^1]: Everything (bot, source code, server) is really sponsored by Xander's money.
