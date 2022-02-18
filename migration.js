@@ -830,7 +830,7 @@ const umzug = new Umzug({
           },
           {
             image_link:
-              "https://media.discordapp.net/attachments/893759325393289256/901425183460581386/IMG_3661.jpg?width=507&height=676",
+              "https://media.discordapp.net/attachments/893759325393289256/901425227723075604/IMG_3661.jpg?width=507&height=676",
             date_created: new Date(Date.now())
               .toISOString()
               .replace("T", " ")
@@ -838,7 +838,7 @@ const umzug = new Umzug({
           },
           {
             image_link:
-              "https://media.discordapp.net/attachments/893759325393289256/901425183460581386/IMG_5756.jpg?width=507&height=676",
+              "https://media.discordapp.net/attachments/893759325393289256/901425241333592114/IMG_5756.jpg?width=901&height=676",
             date_created: new Date(Date.now())
               .toISOString()
               .replace("T", " ")
