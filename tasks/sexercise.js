@@ -1,4 +1,8 @@
 const cron = require("node-cron");
+const dotenv = require("dotenv");
+
+dotenv.config();
+const twitchLink = process.env.TWITCH_LINK;
 
 module.exports = {
     name: "sexercise",
@@ -10,8 +14,7 @@ module.exports = {
                     activities: [
                       {
                         name: "Sexercise",
-                        // TODO: Can probably make this part of the environment variables
-                        url: "https://www.twitch.tv/amouranth",
+                        url: twitchLink,
                         type: 1,
                       },
                     ],
