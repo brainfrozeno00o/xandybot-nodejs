@@ -7,6 +7,8 @@ const {
 
 const sequelize = getInstance();
 let allQuotes,
+  allQuotesRandomPool,
+  randomQuoteReleaseCounter = 0,
   allQuotesLength = 0,
   unreleasedQuotes,
   released = 0;
@@ -54,6 +56,15 @@ const getAllQuotesFromDatabase = async () => {
     });
   } catch (e) {
     console.error(`Error while trying to get info on quotes: ${e}`);
+  } finally {
+    allQuotesRandomPool = allQuotes.map((quote) => {
+      return {
+        id: quote.id,
+        quote: quote.quote,
+        context: quote.context,
+        released: false,
+      };
+    });
   }
 };
 
@@ -69,9 +80,34 @@ const getAllQuotes = () => {
   return allQuotes;
 };
 
-// method does not involve pooling, mainly for the /clown command
 const getRandomQuote = () => {
-  return allQuotes[Math.floor(Math.random() * allQuotes.length)];
+  // filter out quotes that are not released yet in the random pool
+  const allRandomQuotesUnreleased = allQuotesRandomPool.filter(
+    (quote) => quote.released === false
+  );
+
+  const chosenRandomQuote =
+    allRandomQuotesUnreleased[
+      Math.floor(Math.random() * allRandomQuotesUnreleased.length)
+    ];
+
+  // set released now to true for the random pool and increment counter
+  const randomIndex = allQuotesRandomPool.findIndex(
+    (quote) => quote.id === chosenRandomQuote.id
+  );
+  allQuotesRandomPool[randomIndex].released = true;
+  ++randomQuoteReleaseCounter;
+
+  // check if all are now released; if so, then reset everything
+  if (randomQuoteReleaseCounter === allQuotes.length) {
+    console.info("Resetting random pool for /clown command...");
+    allQuotesRandomPool.forEach((quote) => {
+      quote.released = false;
+    });
+    randomQuoteReleaseCounter = 0;
+  }
+
+  return allQuotes[randomIndex];
 };
 
 // method involves pooling
