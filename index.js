@@ -23,19 +23,7 @@ const sequelize = new Sequelize(db, dbUser, dbPass, {
 });
 
 const umzug = new Umzug({
-  migrations: {
-    glob: "migrations/updates/*/*.js",
-    resolve: ({ name, path, context }) => {
-      const migration = require(path);
-      return {
-          // adjust the parameters Umzug will
-          // pass to migration methods when called
-          name,
-          up: async () => migration.up(context, Sequelize),
-          down: async () => migration.down(context, Sequelize),
-      };
-    },
-  },
+  migrations: { glob: "migrations/updates/*/*.js" },
   context: sequelize.getQueryInterface(),
   storage: new SequelizeStorage({ sequelize }),
   logger: console,
