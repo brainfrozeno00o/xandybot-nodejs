@@ -2,6 +2,7 @@ const fs = require("fs");
 const { authenticate, syncDatabase } = require("../db/sequelize");
 const { getAllImagesFromDatabase } = require("../service/imageService");
 const { getAllQuotesFromDatabase } = require("../service/quoteService");
+const { getAllSadboySongsFromDatabase } = require("../service/sadboyService");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -48,10 +49,18 @@ const getActivity = (readyTime) => {
     if (getMinutes >= 45 && getMinutes < 55) {
       return generateActivity("with myself in the shower | /help", 0, "dnd");
     } else {
-      return generateActivity("with my milk and steamed bananas | /help", 0, "dnd");
+      return generateActivity(
+        "with my milk and steamed bananas | /help",
+        0,
+        "dnd"
+      );
     }
   } else if (getHours === 15) {
-    return generateActivity("with people that do not think that Yoimiya is the best | /help", 0, "online");
+    return generateActivity(
+      "with people that do not think that Yoimiya is the best | /help",
+      0,
+      "online"
+    );
   } else if (getHours === 17) {
     return generateActivity("K-pop idols/trainees cry", 3, "dnd");
   } else {
@@ -74,6 +83,7 @@ module.exports = {
     await authenticate();
     await getAllQuotesFromDatabase();
     await getAllImagesFromDatabase();
+    await getAllSadboySongsFromDatabase();
 
     // executing tasks here
     for (const file of taskFiles) {
