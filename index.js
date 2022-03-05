@@ -3,11 +3,33 @@ const { Client, Intents, Collection } = require("discord.js");
 const { overrideConsole } = require("./service/logger");
 const { close } = require("./db/sequelize");
 const { storeQuotesUpForRelease } = require("./service/quoteService");
+const Sequelize = require("sequelize");
+const { Umzug, SequelizeStorage } = require("umzug");
 const fs = require("fs");
 
 dotenv.config();
 overrideConsole(); // for custom logging only...
 
+// setup for the updated migrations happen here
+const db = process.env.DB;
+const dbUser = process.env.DB_USER;
+const dbPass = process.env.DB_PASS;
+const dbServer = process.env.DB_SERVER;
+
+const sequelize = new Sequelize(db, dbUser, dbPass, {
+  host: dbServer,
+  dialect: "postgres",
+  logging: false,
+});
+
+const umzug = new Umzug({
+  migrations: { glob: "migrations/updates/*/*.js" },
+  context: sequelize.getQueryInterface(),
+  storage: new SequelizeStorage({ sequelize }),
+  logger: console,
+});
+
+// setting up bot
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
@@ -57,17 +79,14 @@ for (const file of commandFiles) {
   })
 );
 
-/**
- * Another implementation for above could be the following:
- *
- * function signalHandler() {
- *  // do stuff here
- *  process.exit(0);
- * }
- *
- * process.on("SIGINT", signalHandler);
- * process.on("SIGTERM", signalHandler);
- * process.on("SIGQUIT", signalHandler);
- */
-
-client.login(token);
+(async () => {
+  try {
+    console.info("Performing updated migrations...");
+    await umzug.up();
+  } catch (e) {
+    console.error(`Error occurred in updating migration: ${e}`);
+  } finally {
+    console.info("Done with updating the database and now starting the bot...");
+    client.login(token);
+  }
+})();

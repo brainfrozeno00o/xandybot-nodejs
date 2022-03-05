@@ -24,6 +24,10 @@ const UnreleasedQuote = require("./models/unreleasedQuotes")(
   sequelize,
   Sequelize.DataTypes
 );
+const SadboySong = require("./models/sadboySongs")(
+  sequelize,
+  Sequelize.DataTypes
+);
 
 const syncDatabase = async () => {
   try {
@@ -32,7 +36,6 @@ const syncDatabase = async () => {
   } catch (e) {
     console.error(`Problem in syncing database: ${e}`);
   }
-
 };
 
 const getInstance = () => {
@@ -66,4 +69,5 @@ module.exports = {
   Quote,
   UnreleasedQuote,
   UsedQuote,
+  SadboySong,
 };
