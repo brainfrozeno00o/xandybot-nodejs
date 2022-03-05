@@ -1,6 +1,6 @@
 {
   "name": "xandybot",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "XandyBot using Node.js",
   "main": "index.js",
   "scripts": {
