@@ -44,8 +44,13 @@ const checkStreamInfo = async (users) => {
     });
     // see https://dev.twitch.tv/docs/api/reference#get-streams for documentation
     if (response.data) {
-      // TODO: Process the data
-      console.log(response.data);
+      return response.data.data.map((streamData) => ({
+        streamTitle: streamData.title,
+        thumbnail: streamData.thumbnail_url,
+        userId: streamData.user_login,
+        username: streamData.user_name,
+        viewers: streamData.viewer_count,
+      }));
     }
   } catch (e) {
     console.error(`Error while trying to get streamer access: ${e}`);
