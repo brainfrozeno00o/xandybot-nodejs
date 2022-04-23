@@ -20,14 +20,14 @@ module.exports = {
       environment === "development" ? "xander-bot-test-channel" : "general";
 
     // get all channels needed
-    console.info("Getting all channel IDs...");
+    console.info("Getting all channel IDs for quote sending...");
     const allChannelIds = await client.guilds.cache.map((guild) => {
       const getChannelByName = guild.channels.cache.find(
         (channel) => channel.name === channelName
       );
       return getChannelByName.id;
     });
-    console.info("Done getting all channel IDs...");
+    console.info("Done getting all channel IDs for quote sending...");
 
     try {
       cron.schedule(cronString, function() {

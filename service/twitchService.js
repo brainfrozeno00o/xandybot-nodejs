@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const GET_TWITCH_ID_URL = "https://id.twitch.tv/oauth2/token";
-const GET_STREAM_INFO_URL = "https://api.twitch.tv/helix/streams";
+const GET_STREAM_INFO_URL = "https://api.twitch.tv/helix/streams?";
 const clientId = process.env.TWITCH_CLIENT_ID;
 const clientSecret = process.env.TWITCH_CLIENT_SECRET;
 const grantType = "client_credentials";
@@ -29,7 +29,7 @@ const authenticateTwitch = async () => {
 
 // literally fucking bad code
 const checkStreamInfo = async (users) => {
-  let finalRequestLink = GET_STREAM_INFO_URL + "?";
+  let finalRequestLink = GET_STREAM_INFO_URL;
 
   users.forEach((user) => {
     finalRequestLink = finalRequestLink + `user_login=${user}&`;

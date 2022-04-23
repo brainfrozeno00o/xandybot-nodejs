@@ -1,95 +1,57 @@
 const cron = require("node-cron");
 const { checkStreamInfo } = require("../service/twitchService");
 
-// this can probably be improved for sure
-let isAmouranthLive = false;
-let isIngvarrLive = false;
-let isInoMartinoLive = false;
-let isYumidesuLive = false;
+// TODO: list of streamers can probably be put into a database; for now a constant list
+const streamerNames = ["amouranth", "ingvarrhf", "inomartino", "yumidesuuu"];
+// set objects
+const streamers = streamerNames.map((streamer) => {
+  return {
+    name: streamer,
+    isLive: false,
+  };
+});
 let streamersLive = [];
 
-// TODO: Make this dynamic
-const hasStreamerStatus = (user) => {
-  let isStreamerLive;
+const hasStreamerStatus = (streamer) => {
+  const isStreamerLive = streamersLive.find(
+    (status) => status.userId.toLowerCase() === streamer.name
+  );
   /**
-   * The idea for each case is to return true if and only if the former status of the streamer is false
+   * The idea is to return true if and only if the former status of the streamer is false
    * (i.e. streamer was previously offline) and is also currently online (i.e. streamer is currently live)
    */
-  switch (user) {
-    case "amouranth":
-      isStreamerLive = streamersLive.find(
-        (status) => status.userId.toLowerCase() === "amouranth"
-      );
-      if (isStreamerLive) {
-        if (!isAmouranthLive) {
-          isAmouranthLive = true;
-          return isAmouranthLive;
-        }
-      } else {
-        isAmouranthLive = false;
-      }
-      return false;
-    case "ingvarrhf":
-      isStreamerLive = streamersLive.find(
-        (status) => status.userId.toLowerCase() === "ingvarrhf"
-      );
-      if (isStreamerLive) {
-        if (!isIngvarrLive) {
-          isIngvarrLive = true;
-          return isIngvarrLive;
-        }
-      } else {
-        isIngvarrLive = false;
-      }
-      return false;
-    case "inomartino":
-      isStreamerLive = streamersLive.find(
-        (status) => status.userId.toLowerCase() === "inomartino"
-      );
-      if (isStreamerLive) {
-        if (!isInoMartinoLive) {
-          isInoMartinoLive = true;
-          return isInoMartinoLive;
-        }
-      } else {
-        isInoMartinoLive = false;
-      }
-      return false;
-    case "yumidesuuu":
-      isStreamerLive = streamersLive.find(
-        (status) => status.userId.toLowerCase() === "yumidesuuu"
-      );
-      if (isStreamerLive) {
-        if (!isYumidesuLive) {
-          isYumidesuLive = true;
-          return isYumidesuLive;
-        }
-      } else {
-        isYumidesuLive = false;
-      }
-      return false;
-    default:
-      break;
+  if (isStreamerLive) {
+    if (!streamer.isLive) {
+      streamer.isLive = true;
+      return true;
+    }
+  } else {
+    streamer.isLive = false;
   }
+
+  return false;
 };
 
 module.exports = {
   name: "checkStreamStatus",
   async execute(client) {
     // get all channels needed
-    console.info("Getting all channel IDs...");
+    console.info("Getting all channel IDs for Twitch notification sending...");
     const allChannelIds = await client.guilds.cache.map((guild) => {
       const getChannelByName = guild.channels.cache.find(
         (channel) => channel.name === "general"
       );
       return getChannelByName.id;
     });
-    console.info("Done getting all channel IDs...");
+    console.info(
+      "Done getting all channel IDs for Twitch notification sending..."
+    );
 
     // run every 5 seconds = 12 requests per minute
     cron.schedule("*/5 * * * * *", async function() {
-      const streamers = ["amouranth", "ingvarrhf", "inomartino", "yumidesuuu"];
-      streamersLive = await checkStreamInfo(streamers);
+      streamersLive = await checkStreamInfo(
+        streamers.map((streamer) => streamer.name)
+      );
 
       streamers.forEach((streamer) => {
         if (hasStreamerStatus(streamer)) {

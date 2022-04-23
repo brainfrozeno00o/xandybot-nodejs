@@ -91,9 +91,10 @@ async function up({ context }) {
   ]);
 }
 
-// TODO: Delete based on the number of images passed instead of deleting the whole data in an existing table
 async function down({ context }) {
-  await context.bulkDelete("all_images", { where: {} });
+  await context.bulkDelete("all_images", {
+    where: { id: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] },
+  });
 }
 
 module.exports = { up, down };
