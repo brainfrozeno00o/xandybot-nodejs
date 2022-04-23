@@ -55,9 +55,9 @@ module.exports = {
 
       streamers.forEach((streamer) => {
         if (hasStreamerStatus(streamer)) {
-          console.info(`${streamer} IS CURRENTLY ONLINE ON TWITCH!!!`);
+          console.info(`${streamer.name} IS CURRENTLY ONLINE ON TWITCH!!!`);
           const streamerInfo = streamersLive.filter(
-            (streamerStatus) => streamerStatus.userId.toLowerCase() === streamer
+            (streamerStatus) => streamerStatus.userId.toLowerCase() === streamer.name
           )[0];
           const message = `Hello @everyone! ${streamerInfo.username} is live on Twitch. Check out the stream now!!!`;
           const streamImageURL = streamerInfo.thumbnail
