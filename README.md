@@ -11,6 +11,7 @@ This Discord bot does all the shenanigans Rene Alexander S. Castillo does in rea
 - Bot does a callout `HOY @Blitz` every time SJG says something in any channel in a server where **both** the bot and SJG are present. It has a cooldown of an hour before the bot can call him out again.
 - Bot can give a random quote upon the request of a user by running `/clown`. This **should not** affect the scheduled sending of random quotes.
 - Bot can give a random image of the real Xander Castillo by running `/pogi`.
+- Bot can now give a notification if a streamer is currently live on Twitch (limited to only 4 streamers for now).
 
 ## Future Features
 
