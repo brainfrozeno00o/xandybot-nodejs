@@ -25,6 +25,7 @@ const hasStreamerStatus = (streamer) => {
       streamer.isLive = true;
       return true;
     }
+    console.info(`${streamer.name} is currently live on Twitch!`);
   } else {
     streamer.isLive = false;
   }
@@ -55,9 +56,10 @@ module.exports = {
 
       streamers.forEach((streamer) => {
         if (hasStreamerStatus(streamer)) {
-          console.info(`${streamer.name} IS CURRENTLY ONLINE ON TWITCH!!!`);
+          console.info(`${streamer.name} IS NOW LIVE ON TWITCH!!!`);
           const streamerInfo = streamersLive.filter(
-            (streamerStatus) => streamerStatus.userId.toLowerCase() === streamer.name
+            (streamerStatus) =>
+              streamerStatus.userId.toLowerCase() === streamer.name
           )[0];
           const message = `Hello @everyone! ${streamerInfo.username} is live on Twitch. Check out the stream now!!!`;
           const streamImageURL = streamerInfo.thumbnail
