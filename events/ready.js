@@ -3,6 +3,7 @@ const { authenticate, syncDatabase } = require("../db/sequelize");
 const { getAllImagesFromDatabase } = require("../service/imageService");
 const { getAllQuotesFromDatabase } = require("../service/quoteService");
 const { getAllSadboySongsFromDatabase } = require("../service/sadboyService");
+const { authenticateTwitch } = require("../service/twitchService");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -74,7 +75,6 @@ module.exports = {
   async execute(client) {
     console.debug("Bot now ready...");
     const activity = getActivity(new Date(Date.now()));
-    // TODO: Set presence properly depending on the time the bot is deployed
     // set presence here
     await client.user.setPresence(activity);
 
@@ -84,6 +84,10 @@ module.exports = {
     await getAllQuotesFromDatabase();
     await getAllImagesFromDatabase();
     await getAllSadboySongsFromDatabase();
+
+    // get new Twitch token
+    await authenticateTwitch();
+    console.info("Done getting a new Twitch token...");
 
     // executing tasks here
     for (const file of taskFiles) {
