@@ -2,14 +2,18 @@ const cron = require("node-cron");
 const { checkStreamInfo } = require("../service/twitchService");
 
 // TODO: list of streamers can probably be put into a database; for now a constant list
-const streamerNames = ["amouranth", "ingvarrhf", "inomartino", "yumidesuuu"];
+const csBoyzStreamerNames = ["ingvarrhf", "inomartino", "yumidesuuu"];
+const nsfwStreamerNames = ["amouranth"];
 // set objects
-const streamers = streamerNames.map((streamer) => {
-  return {
-    name: streamer,
-    isLive: false,
-  };
-});
+const streamers = csBoyzStreamerNames
+  .concat(nsfwStreamerNames)
+  .map((streamer) => {
+    return {
+      name: streamer,
+      isLive: false,
+      isNsfw: nsfwStreamerNames.includes(streamer),
+    };
+  });
 let streamersLive = [];
 
 const hasStreamerStatus = (streamer) => {
@@ -38,15 +42,33 @@ module.exports = {
   async execute(client) {
     // get all channels needed
     console.info("Getting all channel IDs for Twitch notification sending...");
-    const allChannelIds = await client.guilds.cache.map((guild) => {
-      const getChannelByName = guild.channels.cache.find(
+    const allGeneralChannelIds = await client.guilds.cache.map((guild) => {
+      const getGeneralChannelByName = guild.channels.cache.find(
         (channel) => channel.name === "general"
       );
-      return getChannelByName.id;
+      if (getGeneralChannelByName) {
+        return getGeneralChannelByName.id;
+      }
+    });
+    // TODO: Find a better way in doing this
+    const allNsfwChannelIds = [];
+    await client.guilds.cache.each((guild) => {
+      const getNsfwChannelIds = guild.channels.cache
+        .filter((channel) => channel.nsfw)
+        .map((channel) => channel.id);
+      allNsfwChannelIds.push(...getNsfwChannelIds);
     });
     console.info(
       "Done getting all channel IDs for Twitch notification sending..."
     );
+
+    // helper method for sending embed message
+    const sendEmbedMessage = async (id, message, embedMessage) => {
+      await client.channels.cache.get(id).send({
+        content: message,
+        embeds: [embedMessage],
+      });
+    };
 
     // run every 5 seconds = 12 requests per minute
     cron.schedule("*/5 * * * * *", async function() {
@@ -78,12 +100,15 @@ module.exports = {
             },
           };
 
-          allChannelIds.forEach(async (id) => {
-            await client.channels.cache.get(id).send({
-              content: message,
-              embeds: [streamEmbed],
+          if (streamer.isNsfw) {
+            allNsfwChannelIds.forEach((id) => {
+              sendEmbedMessage(id, message, streamEmbed);
             });
-          });
+          } else {
+            allGeneralChannelIds.forEach((id) => {
+              sendEmbedMessage(id, message, streamEmbed);
+            });
+          }
         }
       });
     });
