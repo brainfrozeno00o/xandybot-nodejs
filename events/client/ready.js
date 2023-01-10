@@ -88,7 +88,7 @@ module.exports = {
 
     // executing tasks here
     for (const file of taskFiles) {
-      const task = require(`../tasks/${file}`);
+      const task = require(`../../tasks/${file}`);
       console.info(`Setting up task: ${task.name}`);
       await task.execute(client);
     }

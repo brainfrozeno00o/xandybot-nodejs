@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
+const { Player } = require("discord-player");
 const { overrideConsole } = require("./service/logger");
 const { storeQuotesUpForRelease } = require("./service/quoteService");
 const fs = require("fs");
@@ -19,17 +20,29 @@ const client = new Client({
 client.commands = new Collection();
 const token = process.env.DISCORD_TOKEN;
 
-// handling events here
-const eventFiles = fs
-  .readdirSync("./events")
-  .filter((file) => file.endsWith(".js"));
+// setting up Discord player
+const player = new Player(client);
 
-for (const file of eventFiles) {
-  const event = require(`./events/${file}`);
-  if (event.once) {
-    client.once(event.name, async (...args) => await event.execute(...args));
+// helper method to get JS files, possible to create a utility class if ever
+const getJSFiles = (directory) => {
+  return fs.readdirSync(directory).filter((file) => file.endsWith(".js"));
+};
+
+// handling events here
+const playerEventFiles = getJSFiles("./events/player");
+const clientEventFiles = getJSFiles("./events/client");
+
+for (const file of playerEventFiles) {
+  const playerEvent = require(`./events/player/${file}`);
+  player.on(playerEvent.name, (...args) => playerEvent.execute(...args));
+}
+
+for (const file of clientEventFiles) {
+  const clientEvent = require(`./events/client/${file}`);
+  if (clientEvent.once) {
+    client.once(clientEvent.name, async (...args) => await clientEvent.execute(...args));
   } else {
-    client.on(event.name, async (...args) => await event.execute(...args));
+    client.on(clientEvent.name, async (...args) => await clientEvent.execute(...args));
   }
 }
 
