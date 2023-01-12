@@ -92,6 +92,27 @@ module.exports = {
                 'Nothing really. Just type "/clown"'
               );
               break;
+            case "play":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "play",
+                "Play any song you'd like and I'll play it for you!",
+                '/play <search query>'
+              );
+              break;
+            case "pause":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "pause",
+                "Ops ops ops! Pause the song!",
+                'Nothing really. Just type "/pause"'
+              );
+              break;
+            case "resume":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "resume",
+                "Aight, let's continue the song!",
+                'Nothing really. Just type "/resume"'
+              );
+              break;
             default:
               singleHelpEmbed = {
                 color: 0xe67e22,

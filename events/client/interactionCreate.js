@@ -1,6 +1,6 @@
 module.exports = {
   name: "interactionCreate",
-  async execute(interaction) {
+  async execute(interaction, player) {
     if (!interaction.isCommand()) return;
 
     const command = interaction.client.commands.get(interaction.commandName);
@@ -8,7 +8,11 @@ module.exports = {
     if (!command) return;
 
     try {
-      await command.execute(interaction);
+      if (command.isMusic) {
+        await command.execute(interaction, player);
+      } else {
+        await command.execute(interaction);
+      }
     } catch (e) {
       console.error(
         `Error occured when executing ${interaction.commandName}: ${e}`

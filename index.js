@@ -23,9 +23,25 @@ const token = process.env.DISCORD_TOKEN;
 // setting up Discord player
 const player = new Player(client);
 
-// helper method to get JS files, possible to create a utility class if ever
+// helper method to get JS files FOR ONE SPECIFIC DIRECTORY, possible to create a utility class if ever
 const getJSFiles = (directory) => {
   return fs.readdirSync(directory).filter((file) => file.endsWith(".js"));
+};
+
+// helper method to get JS files FOR ALL DIRECTORIES IN ONE SPECIFIC DIRECTORY, possible to create a utility class if ever
+const getFileList = (dirName) => {
+  let files = [];
+  const items = fs.readdirSync(dirName, { withFileTypes: true });
+
+  for (const item of items) {
+    if (item.isDirectory()) {
+      files = [...files, ...getFileList(`${dirName}/${item.name}`)];
+    } else {
+      files.push(`${dirName}/${item.name}`);
+    }
+  }
+
+  return files;
 };
 
 // handling events here
@@ -40,19 +56,26 @@ for (const file of playerEventFiles) {
 for (const file of clientEventFiles) {
   const clientEvent = require(`./events/client/${file}`);
   if (clientEvent.once) {
-    client.once(clientEvent.name, async (...args) => await clientEvent.execute(...args));
+    client.once(
+      clientEvent.name,
+      async (...args) => await clientEvent.execute(...args)
+    );
   } else {
-    client.on(clientEvent.name, async (...args) => await clientEvent.execute(...args));
+    client.on(clientEvent.name, async (...args) =>
+      clientEvent.name === "interactionCreate"
+        ? await clientEvent.execute(...args, player)
+        : await clientEvent.execute(...args)
+    );
   }
 }
 
 // handling commands here
-const commandFiles = fs
-  .readdirSync("./commands")
-  .filter((file) => file.endsWith(".js"));
+const commandFiles = getFileList("./commands").filter((file) =>
+  file.endsWith(".js")
+);
 
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
+  const command = require(`${file}`);
   console.info(`Setting up command: ${command.data.name}`);
   client.commands.set(command.data.name, command);
 }

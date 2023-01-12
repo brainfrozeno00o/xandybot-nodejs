@@ -12,12 +12,28 @@ const clientId = process.env.DISCORD_CLIENT_ID;
 const token = process.env.DISCORD_TOKEN;
 
 const commands = [];
-const commandFiles = fs
-  .readdirSync("./commands")
-  .filter((file) => file.endsWith(".js"));
+// can be a utility method
+const getFileList = (dirName) => {
+  let files = [];
+  const items = fs.readdirSync(dirName, { withFileTypes: true });
+
+  for (const item of items) {
+    if (item.isDirectory()) {
+      files = [...files, ...getFileList(`${dirName}/${item.name}`)];
+    } else {
+      files.push(`${dirName}/${item.name}`);
+    }
+  }
+
+  return files;
+};
+
+const commandFiles = getFileList("./commands").filter((file) =>
+  file.endsWith(".js")
+);
 
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
+  const command = require(`${file}`);
   commands.push(command.data.toJSON());
 }
 
