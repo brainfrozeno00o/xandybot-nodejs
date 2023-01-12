@@ -5,8 +5,8 @@ const { QueryType } = require("discord-player");
 module.exports = {
   isMusic: true,
   data: new SlashCommandBuilder()
-    .setName("play")
-    .setDescription("Play any song/s you'd like and I'll play it for you!")
+    .setName("playtop")
+    .setDescription("Play any song/s you'd like ON TOP OF THE CURRENT QUEUE and I'll play it for you!")
     .addStringOption((option) =>
       option
         .setName("query")
@@ -17,10 +17,7 @@ module.exports = {
     const memberVoiceChannel = interaction.member.voice.channel;
 
     try {
-      if (
-        !(interaction.member instanceof GuildMember) ||
-        !memberVoiceChannel
-      ) {
+      if (!(interaction.member instanceof GuildMember) || !memberVoiceChannel) {
         await interaction.reply({
           content: "You're not in a voice channel!",
           ephemeral: true,
@@ -89,17 +86,17 @@ module.exports = {
       });
 
       gotPlaylist
-        ? queue.addTracks(searchResult.tracks)
-        : queue.addTrack(searchResult.tracks[0]);
+        ? queue.insert(searchResult.tracks, 0)
+        : queue.insert(searchResult.tracks[0], 0);
 
       if (!queue.playing) {
         await queue.play();
       }
     } catch (e) {
-      console.error(`There was an error in executing the "play" command: ${e}`);
+      console.error(`There was an error in executing the "playtop" command: ${e}`);
       await interaction.followUp({
         content:
-          'There was a problem in executing "/play". Xandy is now going to cry.',
+          'There was a problem in executing "/playtop". Xandy is now going to cry.',
       });
     }
   },

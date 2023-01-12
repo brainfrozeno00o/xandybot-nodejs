@@ -11,10 +11,11 @@ module.exports = {
       !(interaction.member instanceof GuildMember) ||
       !interaction.member.voice.channel
     ) {
-      return void interaction.reply({
+      await interaction.reply({
         content: "You're not in a voice channel!",
         ephemeral: true,
       });
+      return;
     }
 
     const playerChannelId = interaction.guild.members.me.voice.channelId;
@@ -23,10 +24,11 @@ module.exports = {
       playerChannelId &&
       interaction.member.voice.channelId !== playerChannelId
     ) {
-      return void interaction.reply({
+      await interaction.reply({
         content: "You're not in my voice channel!",
         ephemeral: true,
       });
+      return;
     }
 
     await interaction.deferReply();
@@ -34,14 +36,15 @@ module.exports = {
     const queue = player.getQueue(interaction.guildId);
 
     if (!queue || !queue.playing) {
-      return void interaction.followUp({
+      await interaction.followUp({
         content: "❌ | Nothing is being played!",
       });
+      return;
     }
 
     const success = queue.setPaused(true);
 
-    return void interaction.followUp({
+    await interaction.followUp({
       content: success
         ? "⏸ | Paused current song!"
         : "❌ | Something went wrong!",

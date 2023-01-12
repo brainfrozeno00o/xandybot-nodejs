@@ -4,8 +4,14 @@ const { GuildMember } = require("discord.js");
 module.exports = {
   isMusic: true,
   data: new SlashCommandBuilder()
-    .setName("resume")
-    .setDescription("Aight, let's continue the song!"),
+    .setName("remove")
+    .setDescription("Remove a song from the queue")
+    .addIntegerOption((option) =>
+      option
+        .setName("number")
+        .setDescription("The queue number you want to remove")
+        .setRequired(true)
+    ),
   async execute(interaction, player) {
     if (
       !(interaction.member instanceof GuildMember) ||
@@ -42,11 +48,20 @@ module.exports = {
       return;
     }
 
-    const success = queue.setPaused(false);
+    const trackNumber = interaction.options.getInteger("number") - 1;
+
+    if (trackNumber > queue.tracks.length) {
+      await interaction.followUp({
+        content: "❌ | Track number greater than queue depth!",
+      });
+      return;
+    }
+
+    const removedTrack = queue.remove(trackNumber);
 
     await interaction.followUp({
-      content: success
-        ? "▶ | Resumed current song!"
+      content: removedTrack
+        ? `✅ | Removed **${removedTrack}**!`
         : "❌ | Something went wrong!",
     });
   },

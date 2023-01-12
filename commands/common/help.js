@@ -55,6 +55,7 @@ module.exports = {
         } else {
           let singleHelpEmbed;
 
+          // TODO: Fix this fucking abomination of a switch case...
           switch (splitString[0]) {
             case "helphelphelp":
             case "helpx3":
@@ -95,8 +96,15 @@ module.exports = {
             case "play":
               singleHelpEmbed = singleCommandEmbedBuilder(
                 "play",
-                "Play any song you'd like and I'll play it for you!",
-                '/play <search query>'
+                "Play any song/s you'd like and I'll play it for you!",
+                "/play <search query>"
+              );
+              break;
+            case "playtop":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "playtop",
+                "Play any song/s you'd like ON TOP OF THE CURRENT QUEUE and I'll play it for you!",
+                "/playtop <search query>"
               );
               break;
             case "pause":
@@ -111,6 +119,76 @@ module.exports = {
                 "resume",
                 "Aight, let's continue the song!",
                 'Nothing really. Just type "/resume"'
+              );
+              break;
+            case "skip":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "skip",
+                "Skip the current song in the queue.",
+                'Nothing really. Just type "/skip"'
+              );
+              break;
+            case "nowplaying":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "nowplaying",
+                "Check the song that is currently playing.",
+                'Nothing really. Just type "/nowplaying"'
+              );
+              break;
+            case "queue":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "queue",
+                "View the queue of current songs.",
+                'Nothing really. Just type "/queue"'
+              );
+              break;
+            case "shuffle":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "shuffle",
+                "Shuffle the current queue!",
+                'Nothing really. Just type "/shuffle"'
+              );
+              break;
+            case "loop":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "loop",
+                "Set loop mode of songs in the queue",
+                "/loop <loop mode (0 for OFF, 1 for TRACK, 2 for QUEUE, 3 for AUTOPLAY)>"
+              );
+              break;
+            case "swap":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "swap",
+                "Swap song positions in the queue",
+                "/swap <track1> <track2>"
+              );
+              break;
+            case "move":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "move",
+                "Move a song position in the queue",
+                "/move <track> <position>"
+              );
+              break;
+            case "volume":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "volume",
+                "Adjust playing volume",
+                "/volume <volume (0-200)>"
+              );
+              break;
+            case "stop":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "stop",
+                "Ops ops ops! Stop all in queue!",
+                'Nothing really. Just type "/stop"'
+              );
+              break;
+            case "remove":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "remove",
+                "Remove a song from the queue",
+                "/remove <track number in queue>"
               );
               break;
             default:
@@ -130,10 +208,11 @@ module.exports = {
       } else {
         // map to fields already for the embed
         const allCommands = interaction.client.commands.map((command) => {
+          const commandEmoji = command.isMusic ? ":notes:" : ":milk:";
           const commandData = command.data;
           return {
             name: commandData.name,
-            value: `:milk: ${commandData.description}`,
+            value: `${commandEmoji} ${commandData.description}`,
             inline: false,
           };
         });

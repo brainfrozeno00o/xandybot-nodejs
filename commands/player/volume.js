@@ -4,8 +4,17 @@ const { GuildMember } = require("discord.js");
 module.exports = {
   isMusic: true,
   data: new SlashCommandBuilder()
-    .setName("resume")
-    .setDescription("Aight, let's continue the song!"),
+    .setName("volume")
+    .setDescription("Adjust playing volume")
+    .addIntegerOption((option) =>
+      option
+        .setName("volume")
+        .setDescription("Choose any number from 0-200")
+        // enforce limitations
+        .setMinValue(0)
+        .setMaxValue(200)
+        .setRequired(true)
+    ),
   async execute(interaction, player) {
     if (
       !(interaction.member instanceof GuildMember) ||
@@ -42,11 +51,12 @@ module.exports = {
       return;
     }
 
-    const success = queue.setPaused(false);
+    const volume = interaction.options.getInteger("volume");
+    const success = queue.setVolume(volume);
 
     await interaction.followUp({
       content: success
-        ? "▶ | Resumed current song!"
+        ? `🔊 | Volume set to ${volume}!`
         : "❌ | Something went wrong!",
     });
   },

@@ -4,8 +4,8 @@ const { GuildMember } = require("discord.js");
 module.exports = {
   isMusic: true,
   data: new SlashCommandBuilder()
-    .setName("resume")
-    .setDescription("Aight, let's continue the song!"),
+    .setName("stop")
+    .setDescription("Ops ops ops! Stop all in queue!"),
   async execute(interaction, player) {
     if (
       !(interaction.member instanceof GuildMember) ||
@@ -42,12 +42,10 @@ module.exports = {
       return;
     }
 
-    const success = queue.setPaused(false);
+    queue.destroy();
 
     await interaction.followUp({
-      content: success
-        ? "▶ | Resumed current song!"
-        : "❌ | Something went wrong!",
+      content: "🛑 | Stopped the player!"
     });
   },
 };

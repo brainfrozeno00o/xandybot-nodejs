@@ -1,11 +1,14 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { GuildMember } = require("discord.js");
 
+const trimString = (str, max) =>
+  str.length > max ? `${str.slice(0, max - 3)}...` : str;
+
 module.exports = {
   isMusic: true,
   data: new SlashCommandBuilder()
-    .setName("resume")
-    .setDescription("Aight, let's continue the song!"),
+    .setName("queue")
+    .setDescription("View the queue of current songs."),
   async execute(interaction, player) {
     if (
       !(interaction.member instanceof GuildMember) ||
@@ -31,23 +34,28 @@ module.exports = {
       return;
     }
 
-    await interaction.deferReply();
-
     const queue = player.getQueue(interaction.guildId);
 
-    if (!queue || !queue.playing) {
-      await interaction.followUp({
-        content: "❌ | Nothing is being played!",
+    if (typeof queue !== "undefined") {
+      const embed = {
+        color: 0xcf37ca,
+        title: "Now Playing",
+        description: trimString(
+          `Currently playing: 🎶 | **${queue.current.title}**!\n\n 🎶 | ${queue}`,
+          4095
+        ),
+        footer: {
+          text: "This bot is powered by Xander's money",
+        },
+      };
+
+      await interaction.reply({
+        embeds: [embed],
       });
-      return;
+    } else {
+      await interaction.reply({
+        content: "There's currently nothing in the queue!",
+      });
     }
-
-    const success = queue.setPaused(false);
-
-    await interaction.followUp({
-      content: success
-        ? "▶ | Resumed current song!"
-        : "❌ | Something went wrong!",
-    });
   },
 };
