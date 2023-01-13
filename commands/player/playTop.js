@@ -58,6 +58,10 @@ module.exports = {
       }
 
       const queue = await player.createQueue(interaction.guild, {
+        leaveOnEmptyCooldown: 60000,
+        leaveOnStop: true,
+        leaveOnEnd: false,
+        initialVolume: 80,
         ytdlOptions: {
           quality: "highestaudio", // minimizing video bitrate here
           filter: "audioonly",
