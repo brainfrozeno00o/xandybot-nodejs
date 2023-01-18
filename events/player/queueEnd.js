@@ -1,8 +1,18 @@
 module.exports = {
   name: "queueEnd",
   execute(queue) {
-    queue.metadata.send(
-      "✅ | Queue finished!"
-    );
+    console.info("Queue now finished!");
+    queue.metadata.send("✅ | Queue finished!");
+
+    if (queue.connection) {
+      // wait for a minute before the bot fully leaves the voice channel it is in
+      queue.metadata.forceDisconnect = true;
+      setTimeout(() => {
+        queue.metadata.send(
+          "❌ | Leaving the voice channel as nobody has requested any song/s in about a minute"
+        );
+        queue.connection.disconnect();
+      }, 60000);
+    }
   },
 };

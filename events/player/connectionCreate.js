@@ -4,5 +4,6 @@ module.exports = {
     console.info(
       `Music player connected on ${queue.guild.name}'s voice channel: ${connection.channel.name}`
     );
+    queue.metadata.forceDisconnect = false;
   },
 };
