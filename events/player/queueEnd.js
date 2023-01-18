@@ -6,8 +6,8 @@ module.exports = {
 
     if (queue.connection) {
       // wait for a minute before the bot fully leaves the voice channel it is in
-      queue.metadata.forceDisconnect = true;
       setTimeout(() => {
+        queue.metadata.forceDisconnect = true;
         queue.metadata.send(
           "❌ | Leaving the voice channel as nobody has requested any song/s in about a minute"
         );
