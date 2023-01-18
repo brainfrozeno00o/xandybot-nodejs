@@ -6,7 +6,9 @@ module.exports = {
   isMusic: true,
   data: new SlashCommandBuilder()
     .setName("playtop")
-    .setDescription("Play any song/s you'd like ON TOP OF THE CURRENT QUEUE and I'll play it for you!")
+    .setDescription(
+      "Play any song/s you'd like ON TOP OF THE CURRENT QUEUE and I'll play it for you!"
+    )
     .addStringOption((option) =>
       option
         .setName("query")
@@ -40,23 +42,6 @@ module.exports = {
 
       await interaction.deferReply();
 
-      const query = interaction.options.getString("query");
-      const searchResult = await player
-        .search(query, {
-          requestedBy: interaction.user,
-          searchEngine: QueryType.AUTO,
-        })
-        .catch((e) => {
-          console.error(`Error in searching song/s: ${e}`);
-        });
-
-      if (!searchResult || !searchResult.tracks.length) {
-        await interaction.followUp({
-          content: `Sorry, no results were found with your query: ${query}`,
-        });
-        return;
-      }
-
       const queue = await player.createQueue(interaction.guild, {
         leaveOnEmptyCooldown: 60000,
         leaveOnStop: true,
@@ -83,6 +68,23 @@ module.exports = {
         return;
       }
 
+      const query = interaction.options.getString("query");
+      const searchResult = await player
+        .search(query, {
+          requestedBy: interaction.user,
+          searchEngine: QueryType.AUTO,
+        })
+        .catch((e) => {
+          console.error(`Error in searching song/s: ${e}`);
+        });
+
+      if (!searchResult || !searchResult.tracks.length) {
+        await interaction.followUp({
+          content: `Sorry, no results were found with your query: ${query}`,
+        });
+        return;
+      }
+
       const gotPlaylist = searchResult.playlist;
 
       await interaction.followUp({
@@ -97,7 +99,9 @@ module.exports = {
         await queue.play();
       }
     } catch (e) {
-      console.error(`There was an error in executing the "playtop" command: ${e}`);
+      console.error(
+        `There was an error in executing the "playtop" command: ${e}`
+      );
       await interaction.followUp({
         content:
           'There was a problem in executing "/playtop". Xandy is now going to cry.',

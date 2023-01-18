@@ -43,23 +43,6 @@ module.exports = {
 
       await interaction.deferReply();
 
-      const query = interaction.options.getString("query");
-      const searchResult = await player
-        .search(query, {
-          requestedBy: interaction.user,
-          searchEngine: QueryType.AUTO,
-        })
-        .catch((e) => {
-          console.error(`Error in searching song/s: ${e}`);
-        });
-
-      if (!searchResult || !searchResult.tracks.length) {
-        await interaction.followUp({
-          content: `Sorry, no results were found with your query: ${query}`,
-        });
-        return;
-      }
-
       const queue = await player.createQueue(interaction.guild, {
         leaveOnEmptyCooldown: 60000,
         leaveOnStop: true,
@@ -82,6 +65,23 @@ module.exports = {
         void player.deleteQueue(interaction.guildId);
         await interaction.followUp({
           content: "Couldn't join your voice channel!",
+        });
+        return;
+      }
+
+      const query = interaction.options.getString("query");
+      const searchResult = await player
+        .search(query, {
+          requestedBy: interaction.user,
+          searchEngine: QueryType.AUTO,
+        })
+        .catch((e) => {
+          console.error(`Error in searching song/s: ${e}`);
+        });
+
+      if (!searchResult || !searchResult.tracks.length) {
+        await interaction.followUp({
+          content: `Sorry, no results were found with your query: ${query}`,
         });
         return;
       }
