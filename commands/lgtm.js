@@ -26,44 +26,11 @@ module.exports = {
 
     try {
       const userInfos = new Map();
+
       let statement = interaction.options.getString("statement"),
         mentionedUsers,
         answerEmbed,
         mentionedMessage;
-
-      if (statement) {
-        mentionedUsers = statement.match(/<@\d+?>/g);
-      }
-
-      if (mentionedUsers) {
-        // in the event of multiple users being mentioned, do this
-        const userInfoResults = await Promise.all(
-          mentionedUsers.map(async (mentionedId) => {
-            const discordId = mentionedId.match(/\d+/g);
-            const user = await interaction.client.users.fetch(`${discordId}`);
-            return {
-              id: user.id,
-              username: user.username,
-            };
-          })
-        );
-        // push to a map so in the event of a multiple mentions of a user, there would be no duplicates
-        userInfoResults.forEach((result) =>
-          userInfos.set(result.id, result.username)
-        );
-        // replace mentions in the statement with the proper username and add them to the mentioned users message
-        mentionedMessage = "You were mentioned ";
-        mentionedUsers.forEach((mentionedId) => {
-          const discordId = mentionedId.match(/\d+/g);
-          statement = statement.replaceAll(
-            `${mentionedId}`,
-            userInfos.get(`${discordId}`)
-          );
-          mentionedMessage += `${mentionedId}, `;
-        });
-        // clean last few elements in the string
-        mentionedMessage = mentionedMessage.slice(0, -1).replace(/.$/, "!");
-      }
 
       if (!statement) {
         console.info("Call command for what...");
@@ -72,6 +39,42 @@ module.exports = {
           title: "?",
         };
       } else {
+        // determining mentioned user/s start here
+        mentionedUsers = statement.match(/<@\d+?>/g);
+
+        if (mentionedUsers) {
+          // in the event of multiple users being mentioned, do this
+          const userInfoResults = await Promise.all(
+            mentionedUsers.map(async (mentionedId) => {
+              const discordId = mentionedId.match(/\d+/g);
+              const user = await interaction.client.users.fetch(`${discordId}`);
+              return {
+                id: user.id,
+                username: user.username,
+              };
+            })
+          );
+          // push to a map so in the event of a multiple mentions of a user, there would be no duplicates
+          userInfoResults.forEach((result) =>
+            userInfos.set(result.id, result.username)
+          );
+          // replace mentions in the statement with the proper username and add them to the mentioned users message
+          mentionedMessage = "Mentioned: ";
+
+          mentionedUsers.forEach((mentionedId) => {
+            const discordId = mentionedId.match(/\d+/g);
+
+            statement = statement.replaceAll(
+              `${mentionedId}`,
+              userInfos.get(`${discordId}`)
+            );
+          });
+
+          userInfos.forEach((value, key) => (mentionedMessage += `<@${key}>, `));
+          // clean last few elements in the string
+          mentionedMessage = mentionedMessage.slice(0, -1).replace(/.$/, "!");
+        }
+
         const randomAnswer = Math.floor(Math.random() * 3);
 
         let choiceArray;
