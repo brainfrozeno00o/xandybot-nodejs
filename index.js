@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-const { Client, Intents, Collection } = require("discord.js");
+const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const { overrideConsole } = require("./service/logger");
 const { close } = require("./db/sequelize");
 const { storeQuotesUpForRelease } = require("./service/quoteService");
@@ -31,7 +31,12 @@ const umzug = new Umzug({
 
 // setting up bot
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 });
 client.commands = new Collection();
 const token = process.env.DISCORD_TOKEN;
