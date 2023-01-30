@@ -46,6 +46,8 @@ const getRandomImage = () => {
   allImagesRandomPool[randomIndex].released = true;
   ++randomImageReleaseCounter;
 
+  console.info("Current Random Image Counter:", randomImageReleaseCounter);
+
   // check if all are now released; if so, then reset everything
   if (randomImageReleaseCounter === allImages.length) {
     console.info("Resetting random pool for /pogi command...");

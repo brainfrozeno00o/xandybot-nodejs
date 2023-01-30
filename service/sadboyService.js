@@ -48,6 +48,8 @@ const getRandomSadboySong = () => {
   allSongsRandomPool[randomIndex].released = true;
   ++randomSongReleaseCounter;
 
+  console.info("Current Random Song Counter:", randomSongReleaseCounter);
+
   // check if all are now released; if so, then reset everything
   if (randomSongReleaseCounter === allSadboySongs.length) {
     console.info("Resetting random pool for /maye command...");

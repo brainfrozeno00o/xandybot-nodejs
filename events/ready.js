@@ -1,5 +1,4 @@
 const fs = require("fs");
-const { authenticate, syncDatabase } = require("../db/sequelize");
 const { getAllImagesFromDatabase } = require("../service/imageService");
 const { getAllQuotesFromDatabase } = require("../service/quoteService");
 const { getAllSadboySongsFromDatabase } = require("../service/sadboyService");
@@ -79,8 +78,6 @@ module.exports = {
     await client.user.setPresence(activity);
 
     // Currently best to initialize connection to database once bot is ready as this will not introduce that much delay
-    await syncDatabase();
-    await authenticate();
     await getAllQuotesFromDatabase();
     await getAllImagesFromDatabase();
     await getAllSadboySongsFromDatabase();

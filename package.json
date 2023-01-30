@@ -16,12 +16,7 @@
     "axios": "^0.26.1",
     "discord.js": "^14.7.1",
     "dotenv": "^10.0.0",
-    "node-cron": "^3.0.0",
-    "pg": "^8.7.1",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.13.0",
-    "sequelize-date-no-tz-postgres": "^1.0.0",
-    "umzug": "^3.0.0"
+    "node-cron": "^3.0.0"
   },
   "devDependencies": {
     "eslint": "^8.5.0"

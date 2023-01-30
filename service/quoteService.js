@@ -89,7 +89,7 @@ const getRandomQuote = () => {
   allQuotesRandomPool[randomIndex].released = true;
   ++randomQuoteReleaseCounter;
 
-  console.info("Current Random Counter:", randomQuoteReleaseCounter);
+  console.info("Current Random Quote Counter:", randomQuoteReleaseCounter);
 
   // check if all are now released; if so, then reset everything
   if (randomQuoteReleaseCounter === allQuotes.length) {
@@ -148,6 +148,9 @@ const storeQuotesUpForRelease = async () => {
   console.debug("Processing quotes up for release...");
 
   try {
+    const quotesUpForReleaseCount = getNumberOfQuotesForRelease();
+
+    console.info(`Putting ${quotesUpForReleaseCount} quotes up for release in database...`);
     // write to JSON file
     await jsonService.writeToJsonFile(
       QUOTES_UP_FOR_RELEASE_FILEPATH,
