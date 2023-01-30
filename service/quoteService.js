@@ -55,7 +55,7 @@ const getAllQuotesFromDatabase = async () => {
   } catch (e) {
     console.error(`Error while trying to get info on quotes: ${e}`);
   } finally {
-    console.info("Done trying to get all quotes");
+    console.debug("Done trying to get all quotes");
   }
 };
 

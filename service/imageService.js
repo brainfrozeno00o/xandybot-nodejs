@@ -1,26 +1,15 @@
-const { getInstance, Image } = require("../db/sequelize");
+const { readJsonFile } = require("./jsonDataService");
 
-const sequelize = getInstance();
 let allImages,
   allImagesRandomPool,
   randomImageReleaseCounter = 0;
 
 const getAllImagesFromDatabase = async () => {
   try {
-    allImages = await sequelize.transaction(async (t) => {
-      const images = await Image.findAll(
-        {
-          attributes: ["id", "image_link"],
-        },
-        { transaction: t }
-      );
+    allImages = await readJsonFile("data/images.json");
 
-      return images;
-    });
     console.info("Got all images from database!");
-  } catch (e) {
-    console.error(`Error while trying to get all images: ${e}`);
-  } finally {
+
     allImagesRandomPool = allImages.map((image) => {
       return {
         id: image.id,
@@ -28,6 +17,10 @@ const getAllImagesFromDatabase = async () => {
         released: false,
       };
     });
+  } catch (e) {
+    console.error(`Error while trying to get all images: ${e}`);
+  } finally {
+    console.debug("Done trying to get all images");
   }
 };
 

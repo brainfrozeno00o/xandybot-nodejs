@@ -27,6 +27,7 @@ module.exports = {
       await user.send({
         embeds: [embed],
       });
+
       await interaction.reply({
         content: "Check your DM handsome! :kissing_heart:",
         ephemeral: true,

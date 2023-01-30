@@ -1,26 +1,15 @@
-const { getInstance, SadboySong } = require("../db/sequelize");
+const { readJsonFile } = require("./jsonDataService");
 
-const sequelize = getInstance();
 let allSadboySongs,
   allSongsRandomPool,
   randomSongReleaseCounter = 0;
 
 const getAllSadboySongsFromDatabase = async () => {
   try {
-    allSadboySongs = await sequelize.transaction(async (t) => {
-      const sadboySongs = await SadboySong.findAll(
-        {
-          attributes: ["id", "song_name", "singer", "song_link"],
-        },
-        { transaction: t }
-      );
+    allSadboySongs = await readJsonFile("data/sadboySongs.json");
 
-      return sadboySongs;
-    });
     console.info("Got all sadboy songs from database!");
-  } catch (e) {
-    console.error(`Error while trying to get all sadboy songs: ${e}`);
-  } finally {
+
     allSongsRandomPool = allSadboySongs.map((song) => {
       return {
         id: song.id,
@@ -30,6 +19,10 @@ const getAllSadboySongsFromDatabase = async () => {
         released: false,
       };
     });
+  } catch (e) {
+    console.error(`Error while trying to get all sadboy songs: ${e}`);
+  } finally {
+    console.debug("Done trying to get all sadboy songs");
   }
 };
 
