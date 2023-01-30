@@ -25,10 +25,6 @@ This Discord bot does all the shenanigans Rene Alexander S. Castillo does in rea
 - [npm](https://nodejs.org/en/download/) - Automatically included when installing Node.js, currently using version 8.1.0
 - Your own Discord account - you'll have to create your own bot if you want to run this locally **OR** you can join the [XandyBot](https://discord.gg/vAtFk8n9B2) Discord server to have a development bot assigned to you
 
-### Some Helpful Tools
-
-- [DBeaver](https://dbeaver.io/download/) - helpful tool if you want UI for the database
-
 ## Running the Bot
 
 ### Setting Up Your Own Discord Bot and Inviting it to Your Own Server
@@ -76,13 +72,13 @@ Please refer to the `.env.example` regarding the needed variables when running t
 3. Run `npm install` to install all the needed packages to run this bot.
 4. To register the slash commands for your bot, run `npm run refreshcommands`
 5. To finally run the bot, run `node .`
-6. If you want to run all the scripts from steps 4-6 (just make sure you meet the prerequisite for step 4), run `npm run all-run`
+6. If you want to run all the scripts from steps 4-5 (just make sure you meet the prerequisite for step 4), run `npm run all-run`
 7. To stop it from running, just basically press <kbd>Ctrl</kbd>+<kbd>C</kbd> (or <kbd>⌘</kbd>+<kbd>C</kbd> if on Mac)
 
 ### Running the Bot for the Second Time (and onwards)
 
 1. If there are no updates needed, just run using `node .`
-2. If the commands are updated or there are new commands developed for the bot, you can opt to run `npm run refreshcommands` first or you can execute the scripts succesfully by running `npm run refreshcommands-run`
+2. If the commands are updated or there are new commands developed for the bot, you can opt to run `npm run refreshcommands` first or you can execute the scripts succesfully by running `npm run all-run`
 3. To stop it from running, just basically press <kbd>Ctrl</kbd>+<kbd>C</kbd> (or <kbd>⌘</kbd>+<kbd>C</kbd> if on Mac)
 
 [^1]: Everything (bot, source code, server) is really sponsored by Xander's money.
