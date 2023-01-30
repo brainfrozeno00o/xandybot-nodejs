@@ -43,9 +43,7 @@ const getAllQuotesFromDatabase = async () => {
     console.info(
       `Found a total of ${released} released quotes in the current run`
     );
-  } catch (e) {
-    console.error(`Error while trying to get info on quotes: ${e}`);
-  } finally {
+
     allQuotesRandomPool = allQuotes.map((quote) => {
       return {
         id: quote.id,
@@ -54,6 +52,10 @@ const getAllQuotesFromDatabase = async () => {
         released: false,
       };
     });
+  } catch (e) {
+    console.error(`Error while trying to get info on quotes: ${e}`);
+  } finally {
+    console.info("Done trying to get all quotes");
   }
 };
 
@@ -146,18 +148,10 @@ const storeQuotesUpForRelease = async () => {
   console.debug("Processing quotes up for release...");
 
   try {
-    // bulk create here
-    const unreleasedQuotesForInsertion = unreleasedQuotes.map((quote) => {
-      return {
-        id: quote.id,
-        incoming_quote: quote["incoming_quote"],
-        incoming_context: quote["incoming_context"],
-      };
-    });
     // write to JSON file
     await jsonService.writeToJsonFile(
       QUOTES_UP_FOR_RELEASE_FILEPATH,
-      JSON.stringify(unreleasedQuotesForInsertion, 4, "\t")
+      JSON.stringify(unreleasedQuotes, 4, "\t")
     );
   } catch (e) {
     console.error(
