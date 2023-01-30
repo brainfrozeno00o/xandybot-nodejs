@@ -7,15 +7,20 @@ const {
 
 dotenv.config();
 
+const environment = process.env.ENVIRONMENT;
 const logChannelId = process.env.XANDY_LOG_CHANNEL_ID;
 const logMessageId = process.env.MESSAGE_ID;
 
 module.exports = {
   name: "sendLogs",
-  /* eslint-disable no-undef */
   async execute(client) {
+    // set up needed cron string depending on the environment
+    const cronString =
+      // send logs every 8:05 AM in UAT/Production
+      environment === "development" ? "*/5 * * * *" : "5 0 * * *";
+
     try {
-      cron.schedule("*/5 * * * *", async function() {
+      cron.schedule(cronString, async function() {
         console.info("Setting up log message...");
         // set up initial date
         const dateString = new Date().toLocaleString("en-SG", {
