@@ -23,13 +23,7 @@ This Discord bot does all the shenanigans Rene Alexander S. Castillo does in rea
 
 - [Node.js](https://nodejs.org/en/download/) - Currently using version 16.13.0
 - [npm](https://nodejs.org/en/download/) - Automatically included when installing Node.js, currently using version 8.1.0
-- [PostgreSQL](https://www.postgresql.org/download/) - any version would suffice
 - Your own Discord account - you'll have to create your own bot if you want to run this locally **OR** you can join the [XandyBot](https://discord.gg/vAtFk8n9B2) Discord server to have a development bot assigned to you
-
-### Some Helpful Tools
-
-- [DBeaver](https://dbeaver.io/download/) - helpful tool if you want UI for the database
-- [pgAdmin](https://www.pgadmin.org/download/) - another helpful tool if you want UI for the database
 
 ## Running the Bot
 
@@ -50,19 +44,6 @@ This Discord bot does all the shenanigans Rene Alexander S. Castillo does in rea
    - For creating your own Discord server, please refer to this [helpful link](https://discord.com/blog/starting-your-first-discord-server).
    - After creating a server, create a text channel named `xander-bot-test-channel`. Refer again to this [helpful link](https://discord.com/blog/starting-your-first-discord-server#:~:text=To%20make%20a%20new%20channel,and%20choose%20%E2%80%9Ccreate%20channel.%E2%80%9D) if you are having problems creating a text channel.
 
-### Setting Up the Database
-
-**NOTE**: Once PostgreSQL is installed in your local machine, please ensure that you can run it via command line and it is fully configured. This is because the steps found in this README will make full use of the command line.
-
-1. Open `psql` in the command line by running: `psql -U {username}`
-2. Enter your password when prompted.
-3. Once logged in, create the database `xdy_bot` by running: `CREATE DATABASE xdy_bot;`
-4. If you have seen the `CREATE DATABASE` response, then it's all good.
-5. If you want to make sure that you have _really_ created the database, you can run:\
-   `SELECT datname FROM pg_database WHERE datname = 'xdy_bot'`\
-   If it shows a row, then it's there.
-6. To exit `psql` from the command line, run `\q`
-
 ### Setting the Environment Variables
 
 Please refer to the `.env.example` regarding the needed variables when running the bot in your local environment. Create your own `.env` in the root directory and you can use these recommended values.
@@ -78,10 +59,9 @@ Please refer to the `.env.example` regarding the needed variables when running t
 | KRAZY_TIMEOUT | Cooldown, in seconds, on when the bot can do the callout again. In production, this is 3600. | 120
 | MESSAGE_ID | This is the message ID of the log sent by the bot. | Find [here](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-#:~:text=On%20Android%20press%20and%20hold,name%20and%20select%20Copy%20ID.) on how to get a message ID.
 | ENVIRONMENT | Current environment on where the bot is running | development
-| DB_USER | User name when connecting to the database | postgres
-| DB_PASS | Password needed when connecting to the database |
-| DB_SERVER | The server on where the database is hosted | localhost
-| DB | The name of the database | xdy_bot
+| TWITCH_CLIENT_ID | Twitch Client ID needed for the bot to connect to Twitch API | 
+| TWITCH_CLIENT_SECRET | Twitch Client Secret needed for the bot to connect to Twitch API |
+| TWITCH_LINK | This is actually the link for Amouranth's Twitch - for notifying | https://www.twitch.tv/amouranth
 
 ### Setting Up Local Environment and Running the Bot for the First Time
 
@@ -90,16 +70,15 @@ Please refer to the `.env.example` regarding the needed variables when running t
 1. Clone this repository in a specific folder.
 2. Open the command line and point to the working directory to the specific folder where the project is located (e.g. `cd xandy-bot`)
 3. Run `npm install` to install all the needed packages to run this bot.
-4. **IF THERE IS COMPLETELY NO DATA AND TABLES IN YOUR DATABASE**, you can opt to run `npm run migrate` first to execute the migration script
-5. To register the slash commands for your bot, run `npm run refreshcommands`
-6. To finally run the bot, run `node .`
-7. If you want to run all the scripts from steps 4-6 (just make sure you meet the prerequisite for step 4), run `npm run all-run`
-8. To stop it from running, just basically press <kbd>Ctrl</kbd>+<kbd>C</kbd> (or <kbd>⌘</kbd>+<kbd>C</kbd> if on Mac)
+4. To register the slash commands for your bot, run `npm run refreshcommands`
+5. To finally run the bot, run `node .`
+6. If you want to run all the scripts from steps 4-5 (just make sure you meet the prerequisite for step 4), run `npm run all-run`
+7. To stop it from running, just basically press <kbd>Ctrl</kbd>+<kbd>C</kbd> (or <kbd>⌘</kbd>+<kbd>C</kbd> if on Mac)
 
 ### Running the Bot for the Second Time (and onwards)
 
 1. If there are no updates needed, just run using `node .`
-2. If the commands are updated or there are new commands developed for the bot, you can opt to run `npm run refreshcommands` first or you can execute the scripts succesfully by running `npm run refreshcommands-run`
+2. If the commands are updated or there are new commands developed for the bot, you can opt to run `npm run refreshcommands` first or you can execute the scripts succesfully by running `npm run all-run`
 3. To stop it from running, just basically press <kbd>Ctrl</kbd>+<kbd>C</kbd> (or <kbd>⌘</kbd>+<kbd>C</kbd> if on Mac)
 
 [^1]: Everything (bot, source code, server) is really sponsored by Xander's money.
