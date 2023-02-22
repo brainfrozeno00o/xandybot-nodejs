@@ -23,12 +23,12 @@ module.exports = {
 
       // quotes with the new line most likely have the quotation marks already within the quote
       const embedDescription = quoteTaken.includes("\n")
-        ? '"' + quoteTaken + '"' + "\n- " + contextTaken
-        : '"' + quoteTaken + '"' + " - " + contextTaken;
+        ? `**"${quoteTaken}"**\n- ${contextTaken}`
+        : `**"${quoteTaken}"** - ${contextTaken}`;
 
       const xanderEmbed = {
         color: 0xcf37ca,
-        title: "Random Xander Quote",
+        title: `Random Xander Quote - #${randomQuote.id}`,
         description: embedDescription,
         image: {
           url: imageURL,

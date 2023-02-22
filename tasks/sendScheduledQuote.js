@@ -1,9 +1,6 @@
 const dotenv = require("dotenv");
 const cron = require("node-cron");
-const {
-  getRandomQuoteTask,
-  storeInsertedQuote,
-} = require("../service/quoteService");
+const { getRandomQuoteTask } = require("../service/quoteService");
 
 dotenv.config();
 
@@ -21,12 +18,14 @@ module.exports = {
 
     // get all channels needed
     console.info("Getting all channel IDs for quote sending...");
+
     const allChannelIds = await client.guilds.cache.map((guild) => {
       const getChannelByName = guild.channels.cache.find(
         (channel) => channel.name === channelName
       );
       return getChannelByName.id;
     });
+
     console.info("Done getting all channel IDs for quote sending...");
 
     try {
@@ -35,17 +34,17 @@ module.exports = {
 
         console.info("Generating embed for sending...");
 
-        const quoteTaken = randomQuote["quote"];
-        const contextTaken = randomQuote["context"];
+        const quoteTaken = randomQuote["incoming_quote"];
+        const contextTaken = randomQuote["incoming_context"];
 
         // quotes with the new line most likely have the quotation marks already within the quote
         const embedDescription = quoteTaken.includes("\n")
-          ? "\"" + quoteTaken + "\"" + "\n- " + contextTaken
-          : "\"" + quoteTaken + "\"" + " - " + contextTaken;
+          ? `**"${quoteTaken}"**\n- ${contextTaken}`
+          : `**"${quoteTaken}"** - ${contextTaken}`;
 
         const xanderEmbed = {
           color: 0xcf37ca,
-          title: "Xander Quote of the Day",
+          title: `Xander Quote of the Day - #${randomQuote.id}`,
           description: embedDescription,
           image: {
             url: imageURL,
@@ -67,6 +66,7 @@ module.exports = {
               content: message,
               embeds: [xanderEmbed],
             });
+
             setTimeout(() => messageToDelete.delete(), 10000);
           } else {
             await client.channels.cache.get(id).send({
@@ -76,7 +76,6 @@ module.exports = {
           }
         });
 
-        storeInsertedQuote(randomQuote);
         console.info(
           `Done sending embed message in all ${channelName} channels...`
         );
