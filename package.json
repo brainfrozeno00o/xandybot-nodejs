@@ -4,9 +4,8 @@
   "description": "XandyBot using Node.js",
   "main": "index.js",
   "scripts": {
-    "all-run": "node migration.js && node deployCommands.js && node .",
+    "all-run": "node deployCommands.js && node .",
     "refreshcommands": "node deployCommands.js",
-    "refreshcommands-run": "node deployCommands.js && node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Xander Castillo",
