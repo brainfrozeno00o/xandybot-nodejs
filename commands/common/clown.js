@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { getRandomQuote } = require("../service/quoteService");
+const { getRandomQuote } = require("../../service/quoteService");
 
 dotenv.config();
 
