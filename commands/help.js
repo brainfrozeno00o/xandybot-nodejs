@@ -92,6 +92,13 @@ module.exports = {
                 'Nothing really. Just type "/clown"'
               );
               break;
+            case "bocchi":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "bocchi",
+                "I will give you a random GIF of a certain character from Bocchi the Rock.",
+                '/bocchi <character>"'
+              );
+              break;
             default:
               singleHelpEmbed = {
                 color: 0xe67e22,
