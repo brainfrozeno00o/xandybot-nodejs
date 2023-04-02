@@ -4,6 +4,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
+  EmbedBuilder,
 } = require("discord.js");
 const dotenv = require("dotenv");
 
@@ -23,15 +24,18 @@ const OPTION_EMOJIS = [
   "🔟",
 ];
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
+const DELAY = 3;
 
-const getCurrentReactions = (message, interaction) => {
+const getTopVotedOption = (message, interaction) => {
+  const overallResults = [];
+  let highestReactionCount = 0;
   const messageCache = message.reactions.cache;
 
   messageCache.forEach(async (reaction) => {
     const emojiName = reaction.emoji.name;
-    const emojiCount = reaction.count - 1;
     const reactionUserIds = await reaction.users.fetch();
 
+    // excludes bot
     const reactionUsernames = await Promise.all(
       [...reactionUserIds.keys()]
         .filter((userId) => userId !== CLIENT_ID)
@@ -43,10 +47,26 @@ const getCurrentReactions = (message, interaction) => {
         })
     );
 
+    const reactionCount = reactionUsernames.length;
+
+    if (reactionCount >= highestReactionCount) {
+      // only set when they're not equal
+      if (reactionCount !== highestReactionCount) {
+        highestReactionCount = reactionCount;
+      }
+      overallResults.push({
+        emoji: emojiName,
+        count: reactionCount,
+        reactors: reactionUsernames,
+      });
+    }
+
     console.info(
-      `Current Info for ${emojiName}  - ${emojiCount} with users: ${reactionUsernames}`
+      `Current Info for ${emojiName}  - ${reactionCount} with users: ${reactionUsernames}`
     );
   });
+
+  return overallResults;
 };
 
 const pollSlashCommand = new SlashCommandBuilder()
@@ -117,9 +137,30 @@ module.exports = {
         const option = interaction.options.getString(`option-${i}`);
 
         if (option) {
-          options.push(option);
+          options.push({
+            emoji: `${OPTION_EMOJIS[i - 1]}`,
+            option: option,
+          });
         }
       }
+
+      const closePollUnixTimestamp =
+        Math.floor(Date.now() / 1000) + pollCloseInSeconds + DELAY;
+
+      const embed = {
+        color: 0xcf37ca,
+        title: question,
+        description: `Created by ${interaction.member.user.tag} - poll expires <t:${closePollUnixTimestamp}:R>`,
+        fields: options.map((info) => {
+          return {
+            name: `${info.emoji}  - ${info.option}`,
+            value: "",
+          };
+        }),
+        footer: {
+          text: "This bot is powered by Xander's money",
+        },
+      };
 
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
@@ -128,12 +169,9 @@ module.exports = {
           .setStyle(ButtonStyle.Danger)
       );
 
-      console.debug(`Got statement: ${question}`);
-      console.debug(`Poll would close in ${pollCloseInSeconds} seconds...`);
-      options.forEach((option) => console.debug(`Added option: ${option}`));
-
       const pollMessage = await interaction.reply({
         content: "This is currently in progress... :tools:",
+        embeds: [embed],
         components: [row],
         fetchReply: true,
       });
@@ -153,14 +191,10 @@ module.exports = {
       });
 
       reactionCollector.on("collect", async (reaction, user) => {
-        // TODO: Calculate overall reactions
-        await getCurrentReactions(pollMessage, interaction);
         console.info(`Got reaction ${reaction.emoji.name}  from ${user.tag}`);
       });
 
       reactionCollector.on("remove", async (reaction, user) => {
-        // TODO: Calculate overall reactions
-        await getCurrentReactions(pollMessage, interaction);
         console.info(`Removed reaction ${reaction.emoji.name}  by ${user.tag}`);
       });
 
@@ -175,8 +209,30 @@ module.exports = {
 
       buttonCollector.on("collect", async (action) => {
         if (action.user.id === interaction.member.user.id) {
-          // TODO: Calculate overall reactions
-          await getCurrentReactions(pollMessage, interaction);
+          const finalResults = getTopVotedOption(pollMessage, interaction);
+
+          const finalEmbed = EmbedBuilder.from(pollMessage.embeds[0])
+            .setDescription(
+              finalResults.length > 1
+                ? `Created and closed by ${interaction.member.user.tag}, see top options below!`
+                : `Created and closed by ${interaction.member.user.tag}, see top option below!`
+            )
+            .setFields(
+              finalResults.map((result) => {
+                const option = options.find(
+                  (item) => item.emoji === result.emoji
+                );
+
+                return {
+                  name: `${option.emoji}  - ${option.option}`,
+                  value:
+                    result.reactors > 0
+                      ? `Voted by: ${result.reactors}`
+                      : `Voted by no one...`,
+                };
+              })
+            );
+
           pollEnded = true;
 
           await reactionCollector.stop(
@@ -184,7 +240,8 @@ module.exports = {
           );
 
           await pollMessage.edit({
-            content: `Poll was now closed by ${interaction.member.user.tag}!`,
+            content: "Poll is now closed!",
+            embeds: [finalEmbed],
             components: [],
           });
 
@@ -206,10 +263,50 @@ module.exports = {
 
       setTimeout(async () => {
         if (!pollEnded) {
-          // TODO: Calculate overall reactions
-          await getCurrentReactions(pollMessage, interaction);
+          const finalResults = getTopVotedOption(pollMessage, interaction);
+
+          const finalEmbed = EmbedBuilder.from(pollMessage.embeds[0])
+            .setDescription(
+              finalResults.length > 1
+                ? `Created by ${interaction.member.user.tag} - has now expired, see top options below!`
+                : `Created by ${interaction.member.user.tag} - has now expired, see top option below!`
+            )
+            .spliceFields(0, options.length)
+            .addFields(
+              finalResults.map((result) => {
+                const option = options.find(
+                  (item) => item.emoji === result.emoji
+                );
+
+                return {
+                  name: `${option.emoji}  - ${option.option}`,
+                  value:
+                    result.reactors > 0
+                      ? `Voted by: ${result.reactors}`
+                      : `Voted by no one...`,
+                };
+              })
+            );
+
+          // finalResults.forEach((result) => {
+          //   const option = options.find(
+          //     (item) => item.emoji === result.emoji
+          //   );
+
+          //   finalEmbed.addFields(
+          //     {
+          //       name: `${option.emoji}  - ${option.option}`,
+          //       value:
+          //         result.reactors > 0
+          //           ? `Voted by: ${result.reactors}`
+          //           : `Voted by no one...`,
+          //     }
+          //   );
+          // });
+
           await pollMessage.edit({
-            content: `Well, this was edited after ${pollCloseInSeconds} seconds!`,
+            content: "Poll is now closed!",
+            embeds: [finalEmbed],
             components: [],
           });
         }
