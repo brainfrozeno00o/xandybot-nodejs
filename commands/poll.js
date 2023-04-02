@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
 
 const MAX_OPTIONS = 10;
 const OPTION_EMOJIS = [
@@ -71,6 +72,7 @@ module.exports = {
   async execute(interaction) {
     console.debug("Creating poll...");
 
+    let pollEnded = false;
     try {
       const question = interaction.options.getString("question");
       const pollCloseInSeconds =
@@ -85,12 +87,21 @@ module.exports = {
         }
       }
 
+      const row = new ActionRowBuilder()
+        .addComponents(
+          new ButtonBuilder()
+            .setCustomId("close-poll")
+            .setLabel("Close Poll")
+            .setStyle(ButtonStyle.Danger)
+        );
+
       console.debug(`Got statement: ${question}`);
       console.debug(`Poll would close in ${pollCloseInSeconds} seconds...`);
       options.forEach((option) => console.debug(`Added option: ${option}`));
 
       const pollMessage = await interaction.reply({
         content: "This is currently in progress... :tools:",
+        components: [row],
         fetchReply: true,
       });
 
@@ -98,10 +109,68 @@ module.exports = {
         await pollMessage.react(`${OPTION_EMOJIS[i]}`);
       }
 
+      const reactionFilter = (reaction, user) => {
+        return OPTION_EMOJIS.includes(reaction.emoji.name) && !user.bot;
+      };
+
+      const reactionCollector = pollMessage.createReactionCollector({
+        reactionFilter,
+        time: pollCloseInSeconds * 1000,
+        dispose: true,
+      });
+
+      reactionCollector.on("collect", async (reaction, user) => {
+        // TODO: Calculate overall reactions
+        console.info(`Got reaction ${reaction.emoji.name} from ${user.tag}`);
+      });
+
+      reactionCollector.on("remove", async (reaction, user) => {
+        // TODO: Calculate overall reactions
+        console.info(`Removed reaction ${reaction.emoji.name} by ${user.tag}`);
+      });
+
+      reactionCollector.on("end", collected => {
+        console.debug(`Collected ${collected.size} reaction interactions!`);
+      });
+
+      const buttonCollector = pollMessage.createMessageComponentCollector({
+        componentType: ComponentType.Button,
+        time: pollCloseInSeconds * 1000,
+      });
+
+      buttonCollector.on("collect", async action => {
+        if (action.user.id === interaction.member.user.id) {
+          // TODO: Calculate overall reactions
+          pollEnded = true;
+
+          reactionCollector.stop(`${interaction.member.user.tag} has opted to cancel the poll!`);
+
+          await pollMessage.edit({
+            content: `Poll was now closed by ${interaction.member.user.tag}!`,
+            components: []
+          });
+
+          buttonCollector.stop(`${interaction.member.user.tag} has opted to cancel the poll!`);
+        } else {
+          await action.reply({
+            content: "Sorry, you can't cancel the poll since you did not create it!",
+            ephemeral: true,
+          });
+        }
+      });
+
+      buttonCollector.on("end", collected => {
+        console.debug(`Collected ${collected.size} button interactions!`);
+      });
+
       setTimeout(async () => {
-        await pollMessage.edit({
-            content: `Well, this was edited after ${pollCloseInSeconds} seconds!`
-        });
+        if (!pollEnded) {
+          // TODO: Calculate overall reactions
+          await pollMessage.edit({
+            content: `Well, this was edited after ${pollCloseInSeconds} seconds!`,
+            components: []
+          });
+        }
       }, pollCloseInSeconds * 1000);
     } catch (e) {
       console.error(`Error occurred when trying to do poll command: ${e}`);
