@@ -24,13 +24,14 @@ const OPTION_EMOJIS = [
   "🔟",
 ];
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-const DELAY = 3;
+const DELAY_SECONDS = 3;
 
-const getTopVotedOption = async (message, interaction) => {
+const getTopVotedOptions = async (message, interaction) => {
   const initialResults = await Promise.all(
     message.reactions.cache.map(async (reaction) => {
       const emojiName = reaction.emoji.name;
       const reactionUserIds = await reaction.users.fetch();
+      const reactionCount = reaction.count - 1;
 
       // excludes bot
       const reactionUsernames = await Promise.all(
@@ -38,26 +39,51 @@ const getTopVotedOption = async (message, interaction) => {
           .filter((userId) => userId !== CLIENT_ID)
           .map(async (userId) => {
             const user = await interaction.client.users.fetch(userId);
-            if (!user.bot) {
-              return user.username;
-            }
+            return user.username;
           })
       );
-
-      const reactionCount = reactionUsernames.length;
 
       return {
         emoji: emojiName,
         count: reactionCount,
-        reactors: reactionUsernames,
+        usernames: reactionUsernames,
       };
     })
   );
 
-  return initialResults.filter(
-    (item) =>
-      item.count === Math.max(...initialResults.map((result) => result.count))
+  const maxNumberOfReacts = Math.max(
+    ...initialResults.map((result) => result.count)
   );
+
+  return initialResults.filter((item) => item.count === maxNumberOfReacts);
+};
+
+const generateFinalEmbed = (
+  originalEmbed,
+  description,
+  finalResults,
+  options
+) => {
+  return EmbedBuilder.from(originalEmbed)
+    .setDescription(description)
+    .setFields(
+      finalResults.map((result) => {
+        const option = options.find((item) => item.emoji === result.emoji);
+
+        return {
+          name:
+            result.count > 1
+              ? `${option.emoji}  - ${option.option} (${result.count} votes)`
+              : result.count === 1
+              ? `${option.emoji}  - ${option.option} (1 vote)`
+              : `${option.emoji}  - ${option.option} (no votes)`,
+          value:
+            result.count > 0
+              ? `Voted by: ${result.usernames}`
+              : `Voted by no one...`,
+        };
+      })
+    );
 };
 
 const pollSlashCommand = new SlashCommandBuilder()
@@ -107,7 +133,7 @@ pollSlashCommand.addIntegerOption((option) =>
   option
     .setName("close-in")
     .setDescription(
-      "Default = 900 secs. Minimum = 300 secs. Polls have a 3-second buffer for calculating results."
+      "Default = 900 secs. Minimum = 300 secs. Polls have a 2 or 3-second buffer for calculating results."
     )
     .setMinValue(300)
     .setRequired(false)
@@ -137,7 +163,7 @@ module.exports = {
       }
 
       const closePollUnixTimestamp =
-        Math.floor(Date.now() / 1000) + pollCloseInSeconds + DELAY;
+        Math.floor(Date.now() / 1000) + pollCloseInSeconds + DELAY_SECONDS;
 
       const embed = {
         color: 0xcf37ca,
@@ -166,6 +192,15 @@ module.exports = {
         components: [row],
         fetchReply: true,
       });
+
+      const originalEmbed = pollMessage.embeds[0];
+
+      const computingResultsEmbed = {
+        title: "Computing poll results...",
+        footer: {
+          text: "This bot is powered by Xander's money",
+        },
+      };
 
       for (let i = 0; i < options.length; ++i) {
         await pollMessage.react(`${OPTION_EMOJIS[i]}`);
@@ -200,49 +235,27 @@ module.exports = {
 
       buttonCollector.on("collect", async (action) => {
         if (action.user.id === interaction.member.user.id) {
-          const originalEmbed = pollMessage.embeds[0];
-          const computingResultsEmbed = {
-            title: "Computing poll results...",
-            footer: {
-              text: "This bot is powered by Xander's money",
-            },
-          };
-
           await pollMessage.edit({
             embeds: [computingResultsEmbed],
             components: [],
           });
 
-          const finalResults = await getTopVotedOption(
+          const finalResults = await getTopVotedOptions(
             pollMessage,
             interaction
           );
 
-          const finalEmbed = EmbedBuilder.from(originalEmbed)
-            .setDescription(
-              finalResults.length > 1
-                ? `Closed by ${interaction.member.user.tag}, see top options below!`
-                : `Closed by ${interaction.member.user.tag}, see top option below!`
-            )
-            .spliceFields(0, options.length)
-            .addFields(
-              finalResults.map((result) => {
-                const option = options.find(
-                  (item) => item.emoji === result.emoji
-                );
+          const description =
+            finalResults.length > 1
+              ? `Closed by ${interaction.member.user.tag}, see top options below!`
+              : `Closed by ${interaction.member.user.tag}, see top option below!`;
 
-                return {
-                  name:
-                    result.count > 1
-                      ? `${option.emoji}  - ${option.option} (${result.count} votes)`
-                      : `${option.emoji}  - ${option.option} (1 vote)`,
-                  value:
-                    result.count > 0
-                      ? `Voted by: ${result.reactors}`
-                      : `Voted by no one...`,
-                };
-              })
-            );
+          const finalEmbed = generateFinalEmbed(
+            originalEmbed,
+            description,
+            finalResults,
+            options
+          );
 
           pollEnded = true;
 
@@ -273,50 +286,27 @@ module.exports = {
 
       setTimeout(async () => {
         if (!pollEnded) {
-          const originalEmbed = pollMessage.embeds[0];
-
-          const computingResultsEmbed = {
-            title: "Computing poll results...",
-            footer: {
-              text: "This bot is powered by Xander's money",
-            },
-          };
-
           await pollMessage.edit({
             embeds: [computingResultsEmbed],
             components: [],
           });
 
-          const finalResults = await getTopVotedOption(
+          const finalResults = await getTopVotedOptions(
             pollMessage,
             interaction
           );
 
-          const finalEmbed = EmbedBuilder.from(originalEmbed)
-            .setDescription(
-              finalResults.length > 1
-                ? `Voting's over, see top options below!`
-                : `Voting's over, see top option below!`
-            )
-            .spliceFields(0, options.length)
-            .addFields(
-              finalResults.map((result) => {
-                const option = options.find(
-                  (item) => item.emoji === result.emoji
-                );
+          const description =
+            finalResults.length > 1
+              ? `Voting's over, see top options below!`
+              : `Voting's over, see top option below!`;
 
-                return {
-                  name:
-                    result.count > 1
-                      ? `${option.emoji}  - ${option.option} (${result.count} votes)`
-                      : `${option.emoji}  - ${option.option} (1 vote)`,
-                  value:
-                    result.count > 0
-                      ? `Voted by: ${result.reactors}`
-                      : `Voted by no one...`,
-                };
-              })
-            );
+          const finalEmbed = generateFinalEmbed(
+            originalEmbed,
+            description,
+            finalResults,
+            options
+          );
 
           await pollMessage.edit({
             embeds: [finalEmbed],

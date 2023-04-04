@@ -99,6 +99,13 @@ module.exports = {
                 '/bocchi <character>"'
               );
               break;
+            case "poll":
+              singleHelpEmbed = singleCommandEmbedBuilder(
+                "poll",
+                "Create a poll with up to 10 options! Polls expire after 15 minutes by default but you can set a time as long as it's at least 300 seconds.",
+                "/poll <question> <option-1> <option-2>"
+              );
+              break;
             default:
               singleHelpEmbed = {
                 color: 0xe67e22,
