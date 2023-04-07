@@ -26,6 +26,54 @@ const OPTION_EMOJIS = [
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DELAY_SECONDS = 3;
 
+const getClosePollInSeconds = (closeInString) => {
+  if (!closeInString) {
+    return 900;
+  }
+
+  let finalCloseInSeconds = 0;
+
+  if (!isNaN(closeInString)) {
+    finalCloseInSeconds = +closeInString;
+  }
+
+  // parse duration string here
+  const daysRegex = /(\d+)\s*d(ay(s)?)?/gi;
+  const hoursRegex = /(\d+)\s*h(r?(our)?s?)?/gi;
+  const minutesRegex = /(\d+)\s*m(in(ute)?s?)?/gi;
+  const secondsRegex = /(\d+)\s*s(ec(ond)?s?)?/gi;
+
+  /**
+   * For each time unit - In the event that there are multiple matches for each RegEx, we ONLY consider the first match!
+   *
+   * Say that we have the duration string of "1h 2 hours 30min 25s 30 secs", the final duration string would just be "1h 30min 25s" - which results to
+   * (1 * 3600) + (30 * 60) + 25 = 5425 seconds
+   */
+  const daysMatches = closeInString.match(daysRegex);
+  const hoursMatches = closeInString.match(hoursRegex);
+  const minutesMatches = closeInString.match(minutesRegex);
+  const secondsMatches = closeInString.match(secondsRegex);
+
+  if (daysMatches) {
+    finalCloseInSeconds += parseInt(daysMatches[0]) * 86400;
+  }
+
+  if (hoursMatches) {
+    finalCloseInSeconds += parseInt(hoursMatches[0]) * 3600;
+  }
+
+  if (minutesMatches) {
+    finalCloseInSeconds += parseInt(minutesMatches[0]) * 60;
+  }
+
+  if (secondsMatches) {
+    finalCloseInSeconds += parseInt(secondsMatches[0]);
+  }
+
+  // force to return 300 seconds if it's less than 300
+  return finalCloseInSeconds < 300 ? 300 : finalCloseInSeconds;
+};
+
 const getTopVotedOptions = async (message, interaction) => {
   const initialResults = await Promise.all(
     message.reactions.cache.map(async (reaction) => {
@@ -88,7 +136,7 @@ const generateFinalEmbed = (
 
 const pollSlashCommand = new SlashCommandBuilder()
   .setName("poll")
-  .setDescription("Create a poll with your own custom options!")
+  .setDescription("Create a poll with up to 10 own custom options! Polls by default expire after 15 minutes.")
   .addStringOption((option) =>
     option
       .setName("question")
@@ -129,13 +177,12 @@ for (let i = 3; i <= MAX_OPTIONS; ++i) {
   );
 }
 
-pollSlashCommand.addIntegerOption((option) =>
+pollSlashCommand.addStringOption((option) =>
   option
     .setName("close-in")
     .setDescription(
-      "Default = 900 secs. Minimum = 300 secs. Polls have a 2 or 3-second buffer for calculating results."
+      "A number or a duration string (supports from days to seconds); returns minimum 5 minutes."
     )
-    .setMinValue(300)
     .setRequired(false)
 );
 
@@ -147,8 +194,9 @@ module.exports = {
     let pollEnded = false;
     try {
       const question = interaction.options.getString("question");
-      const pollCloseInSeconds =
-        interaction.options.getInteger("close-in") || 900;
+      const pollCloseInSeconds = getClosePollInSeconds(
+        interaction.options.getString("close-in")
+      );
       const options = [];
 
       for (let i = 1; i <= MAX_OPTIONS; ++i) {

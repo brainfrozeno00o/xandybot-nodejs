@@ -15,7 +15,12 @@ This Discord bot does all the shenanigans Rene Alexander S. Castillo does in rea
 - Bot can give a random GIF from a specific Bocchi the Rock character of your choice.
 - Bot can now have a function to create a poll.
    - Polls should have at least two options. However, a poll author can have up to 10 options.
-   - Polls by default expire after 15 minutes. However, a poll author can set the poll duration by inputting the number of seconds the poll would expire in.
+   - Polls by default expire after 15 minutes. However, a poll author can set the poll duration by inputting the number of seconds or a parsable duration string. In the event you have inputted something invalid or a number/duration string that is less than 5 minutes, the poll would automatically expire after 5 minutes.
+      - The following strings could be parsed for the following units of time:
+         - days: "1d", "2 days", "3 day"
+         - hours: "1h", "2 hours", "3 hrs", "4hr", "5 hour"
+         - minutes: "1m", "2 min", "3 mins", "4 minutes", "5 minute"
+         - seconds: "1s", "2 secs", "3sec", "4 seconds", "5 second"
    - There is a button that can close the poll, which is visible to all users in the channel. However, only the poll author can really close the poll.
 
 ## Future Features
