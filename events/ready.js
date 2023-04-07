@@ -2,6 +2,7 @@ const fs = require("fs");
 const { getAllImagesFromDatabase } = require("../service/imageService");
 const { getAllQuotesFromDatabase } = require("../service/quoteService");
 const { getAllSadboySongsFromDatabase } = require("../service/sadboyService");
+const { getAllBocchiGifsFromDatabase } = require("../service/bocchiService");
 const { authenticateTwitch } = require("../service/twitchService");
 const dotenv = require("dotenv");
 
@@ -81,6 +82,7 @@ module.exports = {
     await getAllQuotesFromDatabase();
     await getAllImagesFromDatabase();
     await getAllSadboySongsFromDatabase();
+    await getAllBocchiGifsFromDatabase();
 
     // get new Twitch token
     await authenticateTwitch();
