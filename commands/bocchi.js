@@ -43,21 +43,21 @@ module.exports = {
     try {
       const character = interaction.options.getString("character");
       const userTag = interaction.member.user.tag;
-      const loadingGif =
-        "https://media.tenor.com/JzdXdsl9TKsAAAAi/bocchi-rotate.gif";
 
       const currentlyUsing = currentUsers.includes(userTag);
 
       if (currentlyUsing) {
         await interaction.reply({
-          content: "You are currently using the /bocchi command - either you have recently dismissed the message of choosing the GIF or you are currently choosing a GIF...",
+          content:
+            "You are currently using the /bocchi command - either you are currently choosing a GIF or you have recently dismissed the message of choosing the GIF...",
           ephemeral: true,
         });
 
         return;
       } else {
         await interaction.reply({
-          content: loadingGif,
+          content:
+            "<a:slugbocchi:1094241815139454976><a:slugbocchi:1094241815139454976><a:slugbocchi:1094241815139454976>",
           ephemeral: false,
         });
 
@@ -154,7 +154,9 @@ module.exports = {
       });
 
       buttonCollector.on("end", async (collected, reason) => {
-        currentUsers = currentUsers.filter((currentUserTag) => currentUserTag !== userTag);
+        currentUsers = currentUsers.filter(
+          (currentUserTag) => currentUserTag !== userTag
+        );
 
         await interaction.deleteReply(choosingGifMessage);
 
@@ -163,15 +165,13 @@ module.exports = {
             await interaction.deleteReply();
           }, 100);
         } else if (reason.includes("chosen")) {
-          if (gifLink !== loadingGif) {
-            setTimeout(async () => {
-              await interaction.editReply({
-                content: gifLink,
-              });
+          setTimeout(async () => {
+            await interaction.editReply({
+              content: gifLink,
+            });
 
-              console.info("Now sending Bocchi GIF...");
-            }, 100);
-          }
+            console.info("Now sending Bocchi GIF...");
+          }, 100);
         }
 
         console.debug(`Collected ${collected.size} button interactions!`);
