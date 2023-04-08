@@ -10,6 +10,8 @@ const {
   getBocchiGifsOfACharacter,
 } = require("../service/bocchiService");
 
+let currentUsers = [];
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("bocchi")
@@ -44,10 +46,23 @@ module.exports = {
       const loadingGif =
         "https://media.tenor.com/JzdXdsl9TKsAAAAi/bocchi-rotate.gif";
 
-      await interaction.reply({
-        content: loadingGif,
-        ephemeral: false,
-      });
+      const currentlyUsing = currentUsers.includes(userTag);
+
+      if (currentlyUsing) {
+        await interaction.reply({
+          content: "You are currently using the /bocchi command - either you have recently dismissed the message of choosing the GIF or you are currently choosing a GIF...",
+          ephemeral: true,
+        });
+
+        return;
+      } else {
+        await interaction.reply({
+          content: loadingGif,
+          ephemeral: false,
+        });
+
+        currentUsers.push(userTag);
+      }
 
       const listOfBocchiGifs =
         character === "all"
@@ -139,6 +154,8 @@ module.exports = {
       });
 
       buttonCollector.on("end", async (collected, reason) => {
+        currentUsers = currentUsers.filter((currentUserTag) => currentUserTag !== userTag);
+
         await interaction.deleteReply(choosingGifMessage);
 
         if (reason.includes("cancel") || reason === "idle") {
