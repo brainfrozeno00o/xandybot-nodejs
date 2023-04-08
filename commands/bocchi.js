@@ -12,6 +12,16 @@ const {
 
 let currentUsers = [];
 
+const computeGifIndex = (customId, currentGifIndex, currentMaxIndex) => {
+  return customId === "previous"
+    ? currentGifIndex === 0
+      ? currentMaxIndex
+      : --currentGifIndex
+    : currentGifIndex === currentMaxIndex
+    ? 0
+    : ++currentGifIndex;
+};
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("bocchi")
@@ -46,23 +56,20 @@ module.exports = {
 
       const currentlyUsing = currentUsers.includes(userTag);
 
+      const slugBocchiAnimatedEmoji = "<a:slugbocchi:1094241815139454976>";
+
+      await interaction.reply({
+        content: currentlyUsing
+          ? "You are currently using the /bocchi command - either you are currently choosing a GIF or you have recently dismissed the message of choosing the GIF..."
+          : `${slugBocchiAnimatedEmoji}${slugBocchiAnimatedEmoji}${slugBocchiAnimatedEmoji}`,
+        ephemeral: currentlyUsing,
+      });
+
       if (currentlyUsing) {
-        await interaction.reply({
-          content:
-            "You are currently using the /bocchi command - either you are currently choosing a GIF or you have recently dismissed the message of choosing the GIF...",
-          ephemeral: true,
-        });
-
         return;
-      } else {
-        await interaction.reply({
-          content:
-            "<a:slugbocchi:1094241815139454976><a:slugbocchi:1094241815139454976><a:slugbocchi:1094241815139454976>",
-          ephemeral: false,
-        });
-
-        currentUsers.push(userTag);
       }
+
+      currentUsers.push(userTag);
 
       const listOfBocchiGifs =
         character === "all"
@@ -132,11 +139,7 @@ module.exports = {
         await action.deferUpdate();
 
         if (action.customId === "previous" || action.customId === "next") {
-          if (action.customId === "previous") {
-            gifIndex = gifIndex === 0 ? maxIndex : --gifIndex;
-          } else {
-            gifIndex = gifIndex === maxIndex ? 0 : ++gifIndex;
-          }
+          gifIndex = computeGifIndex(action.customId, gifIndex, maxIndex);
 
           await action.editReply({
             embeds: [pagedEmbeds[gifIndex]],

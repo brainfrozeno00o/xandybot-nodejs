@@ -14,7 +14,7 @@ This Discord bot does all the shenanigans Rene Alexander S. Castillo does in rea
 - Bot can now give a notification if a streamer is currently live on Twitch (limited to only 4 streamers for now).
 - Bot can give a GIF from a specific Bocchi the Rock character of your choice **OR** choose a GIF from all the GIFs the bot has.
    - User/s who invoke this command will have to respond to an ephemeral message sent by the bot where they would choose the GIF they want to send. They can opt to do the following options:
-      - Scroll through the GIFs
+      - Browse through the GIFs
       - Choose shown GIF
       - Cancel choosing a GIF
    - There is no time limit really for choosing which GIF to send. However, there is a 10-second idle time that the bot waits for. What's consider idle are the following:
