@@ -18,21 +18,12 @@ const getAllBocchiGifs = () => {
   return allBocchiGifs;
 };
 
-const getRandomBocchiGif = (character) => {
-  const allCharacterGifs = allBocchiGifs.filter((gif) =>
-    gif["tags"].includes(character)
-  );
-
-  const chosenCharacterGif =
-    allCharacterGifs[Math.floor(Math.random() * allCharacterGifs.length)];
-
-  console.info(`Found a random gif for ${character}...`);
-
-  return chosenCharacterGif;
+const getBocchiGifsOfACharacter = (character) => {
+  return allBocchiGifs.filter((gif) => gif["tags"].includes(character));
 };
 
 module.exports = {
   getAllBocchiGifsFromDatabase,
-  getRandomBocchiGif,
+  getBocchiGifsOfACharacter,
   getAllBocchiGifs,
 };

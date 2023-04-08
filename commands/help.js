@@ -95,14 +95,14 @@ module.exports = {
             case "bocchi":
               singleHelpEmbed = singleCommandEmbedBuilder(
                 "bocchi",
-                "I will give you a random GIF of a certain character from Bocchi the Rock.",
+                "I will give you GIFs of characters from Bocchi the Rock. But you choose what to send!",
                 '/bocchi <character>"'
               );
               break;
             case "poll":
               singleHelpEmbed = singleCommandEmbedBuilder(
                 "poll",
-                "Create a poll with up to 10 options! Polls expire after 15 minutes by default but you can set a time as long as it's at least 300 seconds.",
+                "Create a poll with up to 10 custom options! Polls expire after 15 minutes by default but you can set a time as long as it's at least 5 minutes.",
                 "/poll <question> <option-1> <option-2>"
               );
               break;
