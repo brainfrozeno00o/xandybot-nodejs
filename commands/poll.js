@@ -106,6 +106,14 @@ const getTopVotedOptions = async (message, interaction) => {
   return initialResults.filter((item) => item.count === maxNumberOfReacts);
 };
 
+const informPollResults = async (message) => {
+  console.info(`Poll ID - ${message.id} now done!`);
+
+  await message.reply({
+    content: "Hello @everyone! Results are in for this poll!",
+  });
+};
+
 const generateFinalEmbed = (
   originalEmbed,
   description,
@@ -319,6 +327,8 @@ module.exports = {
             embeds: [finalEmbed],
             components: [],
           });
+
+          await informPollResults(pollMessage);
         } else {
           await action.reply({
             content:
@@ -360,6 +370,8 @@ module.exports = {
             embeds: [finalEmbed],
             components: [],
           });
+
+          await informPollResults(pollMessage);
         }
       }, pollCloseInSeconds * 1000);
     } catch (e) {
