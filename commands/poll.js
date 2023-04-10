@@ -106,6 +106,14 @@ const getTopVotedOptions = async (message, interaction) => {
   return initialResults.filter((item) => item.count === maxNumberOfReacts);
 };
 
+const informPollResults = async (message) => {
+  console.info(`Poll ID - ${message.id} now done!`);
+
+  await message.reply({
+    content: "Hello @everyone! Results are in for this poll!",
+  });
+};
+
 const generateFinalEmbed = (
   originalEmbed,
   description,
@@ -136,13 +144,16 @@ const generateFinalEmbed = (
 
 const pollSlashCommand = new SlashCommandBuilder()
   .setName("poll")
-  .setDescription("Create a poll with up to 10 own custom options! Polls by default expire after 15 minutes.")
+  .setDescription(
+    "Create a poll with up to 10 own custom options! Polls by default expire after 15 minutes."
+  )
   .addStringOption((option) =>
     option
       .setName("question")
       .setDescription(
         "The poll question. You need to put one for this to work!"
       )
+      .setMaxLength(1500)
       .setRequired(true)
   )
   .addStringOption((option) =>
@@ -151,6 +162,7 @@ const pollSlashCommand = new SlashCommandBuilder()
       .setDescription(
         "The first option of the poll. You need at least two options for this to work!"
       )
+      .setMaxLength(1500)
       .setRequired(true)
   )
   .addStringOption((option) =>
@@ -159,6 +171,7 @@ const pollSlashCommand = new SlashCommandBuilder()
       .setDescription(
         "The second option of the poll. You need at least two options for this to work!"
       )
+      .setMaxLength(1500)
       .setRequired(true)
   );
 
@@ -173,6 +186,7 @@ for (let i = 3; i <= MAX_OPTIONS; ++i) {
               MAX_OPTIONS - i
             } more option/s after this!`
       )
+      .setMaxLength(1500)
       .setRequired(false)
   );
 }
@@ -192,6 +206,8 @@ module.exports = {
     console.debug("Creating poll...");
 
     let pollEnded = false;
+    let duplicateOption = null;
+
     try {
       const question = interaction.options.getString("question");
       const pollCloseInSeconds = getClosePollInSeconds(
@@ -203,6 +219,17 @@ module.exports = {
         const option = interaction.options.getString(`option-${i}`);
 
         if (option) {
+          const optionAlreadyExists =
+            options.length > 0 &&
+            options
+              .map((item) => item.option.trim().toLowerCase())
+              .includes(option.trim().toLowerCase());
+
+          if (optionAlreadyExists) {
+            duplicateOption = option;
+            break;
+          }
+
           options.push({
             emoji: `${OPTION_EMOJIS[i - 1]}`,
             option: option,
@@ -210,13 +237,22 @@ module.exports = {
         }
       }
 
-      const closePollUnixTimestamp =
+      if (duplicateOption) {
+        await interaction.reply({
+          content: `You have inputted a duplicate poll option: ${duplicateOption}! Try using \`/poll\` again but this time without duplicate options.`,
+          ephemeral: true,
+        });
+
+        return;
+      }
+
+      const closePollUnixTimestampSeconds =
         Math.floor(Date.now() / 1000) + pollCloseInSeconds + DELAY_SECONDS;
 
       const embed = {
         color: 0xcf37ca,
         title: `Poll Question: ${question}`,
-        description: `Created by ${interaction.member.user.tag} - poll expires <t:${closePollUnixTimestamp}:R>`,
+        description: `Created by ${interaction.member.user.tag} - poll expires <t:${closePollUnixTimestampSeconds}:R>`,
         fields: options.map((info) => {
           return {
             name: `${info.emoji}  - ${info.option}`,
@@ -240,6 +276,36 @@ module.exports = {
         components: [row],
         fetchReply: true,
       });
+
+      let createdPollMessageTimestampSeconds = Math.floor(
+        pollMessage.createdTimestamp / 1000
+      );
+
+      const checkPollExpiryTimer = setInterval(async () => {
+        if (
+          closePollUnixTimestampSeconds - ++createdPollMessageTimestampSeconds === 60
+        ) {
+          let checkPollMessage = null;
+
+          try {
+            checkPollMessage = !!await interaction.channel.messages.fetch(
+              `${pollMessage.id}`
+            );
+
+            if (checkPollMessage) {
+              console.info("Poll about to be processed...");
+            }
+          } catch (err) {
+            console.error(`Message has been most likely deleted, cannot inform everyone to react more! - Discord API Error found: ${err}`);
+
+            return;
+          }
+
+          await pollMessage.reply({
+            content: "Hello @everyone! This poll is about to close! React while you still can!",
+          });
+        }
+      }, 1000);
 
       const originalEmbed = pollMessage.embeds[0];
 
@@ -283,6 +349,8 @@ module.exports = {
 
       buttonCollector.on("collect", async (action) => {
         if (action.user.id === interaction.member.user.id) {
+          clearInterval(checkPollExpiryTimer);
+
           await pollMessage.edit({
             embeds: [computingResultsEmbed],
             components: [],
@@ -319,6 +387,8 @@ module.exports = {
             embeds: [finalEmbed],
             components: [],
           });
+
+          await informPollResults(pollMessage);
         } else {
           await action.reply({
             content:
@@ -333,6 +403,24 @@ module.exports = {
       });
 
       setTimeout(async () => {
+        clearInterval(checkPollExpiryTimer);
+
+        let checkPollMessage = null;
+
+        try {
+          checkPollMessage = !!await interaction.channel.messages.fetch(
+            `${pollMessage.id}`
+          );
+
+          if (checkPollMessage) {
+            console.info("Poll will now be processed...");
+          }
+        } catch (err) {
+          console.error(`Message has been most likely deleted, cannot compute results! - Discord API Error found: ${err}`);
+
+          return;
+        }
+
         if (!pollEnded) {
           await pollMessage.edit({
             embeds: [computingResultsEmbed],
@@ -360,6 +448,8 @@ module.exports = {
             embeds: [finalEmbed],
             components: [],
           });
+
+          await informPollResults(pollMessage);
         }
       }, pollCloseInSeconds * 1000);
     } catch (e) {
