@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const { overrideConsole } = require("./service/logger");
-const { storeQuotesUpForRelease } = require("./service/quoteService");
+const { storeQuotesUpForRelease } = require("./service/quote-service");
 const fs = require("fs");
 
 dotenv.config();
