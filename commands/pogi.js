@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { getRandomImage } = require("../service/imageService");
+const { getRandomImage } = require("../service/image-service");
 
 module.exports = {
   data: new SlashCommandBuilder()
