@@ -144,7 +144,9 @@ const generateFinalEmbed = (
 
 const pollSlashCommand = new SlashCommandBuilder()
   .setName("poll")
-  .setDescription("Create a poll with up to 10 own custom options! Polls by default expire after 15 minutes.")
+  .setDescription(
+    "Create a poll with up to 10 own custom options! Polls by default expire after 15 minutes."
+  )
   .addStringOption((option) =>
     option
       .setName("question")
@@ -217,9 +219,11 @@ module.exports = {
         const option = interaction.options.getString(`option-${i}`);
 
         if (option) {
-          const optionAlreadyExists = options.length > 0 ?
-            options.map((item) => item.option.trim().toLowerCase()).includes(option.trim().toLowerCase())
-            : false;
+          const optionAlreadyExists =
+            options.length > 0 &&
+            options
+              .map((item) => item.option.trim().toLowerCase())
+              .includes(option.trim().toLowerCase());
 
           if (optionAlreadyExists) {
             duplicateOption = option;
@@ -273,10 +277,30 @@ module.exports = {
         fetchReply: true,
       });
 
-      let createdPollMessageTimestampSeconds = Math.floor(pollMessage.createdTimestamp / 1000);
+      let createdPollMessageTimestampSeconds = Math.floor(
+        pollMessage.createdTimestamp / 1000
+      );
 
       const checkPollExpiryTimer = setInterval(async () => {
-        if (closePollUnixTimestampSeconds - ++createdPollMessageTimestampSeconds === 60) {
+        if (
+          closePollUnixTimestampSeconds - ++createdPollMessageTimestampSeconds === 60
+        ) {
+          let checkPollMessage = null;
+
+          try {
+            checkPollMessage = !!await interaction.channel.messages.fetch(
+              `${pollMessage.id}`
+            );
+
+            if (checkPollMessage) {
+              console.info("Poll about to be processed...");
+            }
+          } catch (err) {
+            console.error(`Message has been most likely deleted, cannot inform everyone to react more! - Discord API Error found: ${err}`);
+
+            return;
+          }
+
           await pollMessage.reply({
             content: "Hello @everyone! This poll is about to close! React while you still can!",
           });
@@ -381,10 +405,23 @@ module.exports = {
       setTimeout(async () => {
         clearInterval(checkPollExpiryTimer);
 
-        const checkPollMessage = await interaction.channel.messages.fetch(`${pollMessage.id}`);
+        let checkPollMessage = null;
 
-        if (checkPollMessage && !pollEnded) {
+        try {
+          checkPollMessage = !!await interaction.channel.messages.fetch(
+            `${pollMessage.id}`
+          );
 
+          if (checkPollMessage) {
+            console.info("Poll will now be processed...");
+          }
+        } catch (err) {
+          console.error(`Message has been most likely deleted, cannot compute results! - Discord API Error found: ${err}`);
+
+          return;
+        }
+
+        if (!pollEnded) {
           await pollMessage.edit({
             embeds: [computingResultsEmbed],
             components: [],
