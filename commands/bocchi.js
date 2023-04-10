@@ -8,7 +8,7 @@ const {
 const {
   getAllBocchiGifs,
   getBocchiGifsOfACharacter,
-} = require("../service/bocchiService");
+} = require("../service/bocchi-service");
 
 let currentUsers = [];
 

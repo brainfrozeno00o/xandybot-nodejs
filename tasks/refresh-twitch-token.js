@@ -1,5 +1,5 @@
 const cron = require("node-cron");
-const { authenticateTwitch } = require("../service/twitchService");
+const { authenticateTwitch } = require("../service/twitch-service");
 
 module.exports = {
   name: "refreshTwitchToken",

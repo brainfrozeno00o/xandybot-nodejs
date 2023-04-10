@@ -1,4 +1,4 @@
-const jsonService = require("./jsonDataService");
+const jsonService = require("./json-service");
 
 let allQuotes,
   allQuotesRandomPool,
@@ -7,7 +7,7 @@ let allQuotes,
   unreleasedQuotes,
   released = 0;
 
-const QUOTES_UP_FOR_RELEASE_FILEPATH = "data/unreleasedQuotes.json";
+const QUOTES_UP_FOR_RELEASE_FILEPATH = "data/unreleased-quotes.json";
 
 const getAllQuotesFromDatabase = async () => {
   try {

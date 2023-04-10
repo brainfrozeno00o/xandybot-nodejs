@@ -1,4 +1,4 @@
-const { readJsonFile } = require("./jsonDataService");
+const { readJsonFile } = require("./json-service");
 
 let allImages,
   allImagesRandomPool,

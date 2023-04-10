@@ -1,5 +1,5 @@
 const cron = require("node-cron");
-const { checkStreamInfo } = require("../service/twitchService");
+const { checkStreamInfo } = require("../service/twitch-service");
 
 // TODO: list of streamers can probably be put into a database; for now a constant list
 const csBoyzStreamerNames = ["ingvarrhf", "inomartino", "yumidesuuu"];

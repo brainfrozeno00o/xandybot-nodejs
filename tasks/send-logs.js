@@ -3,7 +3,7 @@ const cron = require("node-cron");
 const {
   getNumberOfReleasedQuotes,
   getNumberOfQuotesForRelease,
-} = require("../service/quoteService");
+} = require("../service/quote-service");
 
 dotenv.config();
 

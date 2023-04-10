@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const cron = require("node-cron");
-const { getRandomQuoteTask } = require("../service/quoteService");
+const { getRandomQuoteTask } = require("../service/quote-service");
 
 dotenv.config();
 

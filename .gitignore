@@ -9,4 +9,4 @@ node_modules
 
 # not showing any changes in the unreleased and released quotes JSON files
 # this is not to affect testing in local environment
-data/unreleasedQuotes.json
+data/unreleased-quotes.json

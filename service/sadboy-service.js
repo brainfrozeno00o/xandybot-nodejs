@@ -1,4 +1,4 @@
-const { readJsonFile } = require("./jsonDataService");
+const { readJsonFile } = require("./json-service");
 
 let allSadboySongs,
   allSongsRandomPool,
@@ -6,7 +6,7 @@ let allSadboySongs,
 
 const getAllSadboySongsFromDatabase = async () => {
   try {
-    allSadboySongs = await readJsonFile("data/sadboySongs.json");
+    allSadboySongs = await readJsonFile("data/sadboy-songs.json");
 
     console.info("Got all sadboy songs from database!");
 

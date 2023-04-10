@@ -1,9 +1,9 @@
 const fs = require("fs");
-const { getAllImagesFromDatabase } = require("../service/imageService");
-const { getAllQuotesFromDatabase } = require("../service/quoteService");
-const { getAllSadboySongsFromDatabase } = require("../service/sadboyService");
-const { getAllBocchiGifsFromDatabase } = require("../service/bocchiService");
-const { authenticateTwitch } = require("../service/twitchService");
+const { getAllImagesFromDatabase } = require("../service/image-service");
+const { getAllQuotesFromDatabase } = require("../service/quote-service");
+const { getAllSadboySongsFromDatabase } = require("../service/sadboy-service");
+const { getAllBocchiGifsFromDatabase } = require("../service/bocchi-service");
+const { authenticateTwitch } = require("../service/twitch-service");
 const dotenv = require("dotenv");
 
 dotenv.config();
