@@ -5,7 +5,9 @@ const { getAllSadboySongsFromDatabase } = require("../service/sadboy-service");
 const { getAllBocchiGifsFromDatabase } = require("../service/bocchi-service");
 const { authenticateTwitch } = require("../service/twitch-service");
 const { readJsonFile } = require("../service/json-service");
-const { generatePresenceData } = require("../generator/presence-data-generator");
+const {
+  generatePresenceData,
+} = require("../generator/presence-data-generator");
 
 // handling tasks here
 const taskFiles = fs
@@ -21,24 +23,41 @@ const getActivity = (botPresenceDataList, readyTime) => {
 
   // bad chaining here, probably need to improve on this one
   if (getHours >= 0 && getHours < 13) {
-    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "default");
+    botPresenceData = botPresenceDataList.find(
+      (presenceData) => presenceData.name === "default"
+    );
   } else if (getHours === 13 || (getHours === 14 && getMinutes < 45)) {
-    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "sexercise");
+    botPresenceData = botPresenceDataList.find(
+      (presenceData) => presenceData.name === "sexercise"
+    );
   } else if (getHours === 14 && getMinutes >= 45) {
     if (getMinutes >= 45 && getMinutes < 55) {
-      botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "showering");
+      botPresenceData = botPresenceDataList.find(
+        (presenceData) => presenceData.name === "showering"
+      );
     } else {
-      botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "milk-and-steamed-bananas");
+      botPresenceData = botPresenceDataList.find(
+        (presenceData) => presenceData.name === "milk-and-steamed-bananas"
+      );
     }
   } else if (getHours === 15) {
-    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "genshin");
+    botPresenceData = botPresenceDataList.find(
+      (presenceData) => presenceData.name === "genshin"
+    );
   } else if (getHours === 17) {
-    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "kpop");
+    botPresenceData = botPresenceDataList.find(
+      (presenceData) => presenceData.name === "kpop"
+    );
   } else {
-    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "dota-with-fav");
+    botPresenceData = botPresenceDataList.find(
+      (presenceData) => presenceData.name === "dota-with-fav"
+    );
   }
 
-  return generatePresenceData(botPresenceData.status, botPresenceData.activities);
+  return generatePresenceData(
+    botPresenceData.status,
+    botPresenceData.activities
+  );
 };
 
 module.exports = {
