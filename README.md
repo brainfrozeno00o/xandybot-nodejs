@@ -78,13 +78,18 @@ Please refer to the `.env.example` regarding the needed variables when running t
 | ENVIRONMENT | Current environment on where the bot is running | development
 | TWITCH_CLIENT_ID | Twitch Client ID needed for the bot to connect to Twitch API | 
 | TWITCH_CLIENT_SECRET | Twitch Client Secret needed for the bot to connect to Twitch API |
-| TWITCH_LINK | This is actually the link for Amouranth's Twitch - for notifying | https://www.twitch.tv/amouranth
 
 ### Setting Up Local Environment and Running the Bot for the First Time
 
 **NOTE**: Once npm is installed in your local machine, please ensure that you can run it via command line and it is fully configured. This is because the steps found in this README will make full use of the command line.
 
 1. Clone this repository in a specific folder.
+   - **NOTE** - The `data` folder would be empty upon cloning it. You need to put the following files to make it work (SCHEMAS TO FOLLOW):
+      - `bocchi.json`
+      - `images.json`
+      - `presence-data.json`
+      - `quotes.json`
+      - `sadboy-songs.json`
 2. Open the command line and point to the working directory to the specific folder where the project is located (e.g. `cd xandy-bot`)
 3. Run `npm install` to install all the needed packages to run this bot.
 4. To register the slash commands for your bot, run `npm run refreshcommands`

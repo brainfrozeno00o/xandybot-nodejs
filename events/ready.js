@@ -4,69 +4,41 @@ const { getAllQuotesFromDatabase } = require("../service/quote-service");
 const { getAllSadboySongsFromDatabase } = require("../service/sadboy-service");
 const { getAllBocchiGifsFromDatabase } = require("../service/bocchi-service");
 const { authenticateTwitch } = require("../service/twitch-service");
-const dotenv = require("dotenv");
-
-dotenv.config();
-const twitchLink = process.env.TWITCH_LINK;
+const { readJsonFile } = require("../service/json-service");
+const { generatePresenceData } = require("../generator/presence-data-generator");
 
 // handling tasks here
 const taskFiles = fs
   .readdirSync("./tasks")
   .filter((file) => file.endsWith(".js"));
 
-// custom method for returning the common structure of an activity
-const generateActivity = (name, type, status) => {
-  return {
-    activities: [
-      {
-        name: name,
-        type: type,
-      },
-    ],
-    status: status,
-  };
-};
-
 // custom method for handling the proper status depending on the time the bot is deployed
-const getActivity = (readyTime) => {
+const getActivity = (botPresenceDataList, readyTime) => {
   const getHours = readyTime.getHours();
   const getMinutes = readyTime.getMinutes();
 
+  let botPresenceData;
+
   // bad chaining here, probably need to improve on this one
   if (getHours >= 0 && getHours < 13) {
-    return generateActivity("Dota 2 forever | /help", 0, "online");
+    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "default");
   } else if (getHours === 13 || (getHours === 14 && getMinutes < 45)) {
-    return {
-      activities: [
-        {
-          name: "Sexercise",
-          url: twitchLink,
-          type: 1,
-        },
-      ],
-      status: "dnd",
-    };
+    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "sexercise");
   } else if (getHours === 14 && getMinutes >= 45) {
     if (getMinutes >= 45 && getMinutes < 55) {
-      return generateActivity("with myself in the shower | /help", 0, "dnd");
+      botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "showering");
     } else {
-      return generateActivity(
-        "with my milk and steamed bananas | /help",
-        0,
-        "dnd"
-      );
+      botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "milk-and-steamed-bananas");
     }
   } else if (getHours === 15) {
-    return generateActivity(
-      "with people that do not think that Yoimiya is the best | /help",
-      0,
-      "online"
-    );
+    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "genshin");
   } else if (getHours === 17) {
-    return generateActivity("K-pop idols/trainees cry", 3, "dnd");
+    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "kpop");
   } else {
-    return generateActivity("with Albdog <3 | /help", 0, "dnd");
+    botPresenceData = botPresenceDataList.find((presenceData) => presenceData.name === "dota-with-fav");
   }
+
+  return generatePresenceData(botPresenceData.status, botPresenceData.activities);
 };
 
 module.exports = {
@@ -74,7 +46,9 @@ module.exports = {
   once: true,
   async execute(client) {
     console.debug("Bot now ready...");
-    const activity = getActivity(new Date(Date.now()));
+
+    const botPresenceDataList = await readJsonFile("data/presence-data.json");
+    const activity = getActivity(botPresenceDataList, new Date(Date.now()));
     // set presence here
     await client.user.setPresence(activity);
 
