@@ -7,6 +7,5 @@
 # node_modules
 node_modules
 
-# not showing any changes in the unreleased and released quotes JSON files
-# this is not to affect testing in local environment
-data/unreleased-quotes.json
+# completely hiding it for now
+data
