@@ -8,16 +8,14 @@ const isValidStatus = (status) => {
 
 const generatePresenceData = (
   status,
-  activities = null,
-  afk = false,
-  shardId = null
+  options = {},
 ) => {
   const finalPresenceData = {
     status: isValidStatus(status) ? status : "online",
   };
 
-  if (activities && activities.length > 0) {
-    finalPresenceData.activities = activities.map((activity) => {
+  if (options.activities && options.activities.length > 0) {
+    finalPresenceData.activities = options.activities.map((activity) => {
       const finalActivity = {
         name: activity.name || "/helphelphelp",
         type: isValidType(activity.type) ? activity.type : 0,
@@ -32,12 +30,12 @@ const generatePresenceData = (
   }
 
   // only add afk when needed
-  if (afk) {
-    finalPresenceData.afk = afk;
+  if (options.afk) {
+    finalPresenceData.afk = options.afk;
   }
 
-  if (shardId) {
-    finalPresenceData.shardId = shardId;
+  if (options.shardId) {
+    finalPresenceData.shardId = options.shardId;
   }
 
   return finalPresenceData;

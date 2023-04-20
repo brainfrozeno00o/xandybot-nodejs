@@ -54,10 +54,9 @@ const getActivity = (botPresenceDataList, readyTime) => {
     );
   }
 
-  return generatePresenceData(
-    botPresenceData.status,
-    botPresenceData.activities
-  );
+  return generatePresenceData(botPresenceData.status, {
+    activities: botPresenceData.activities,
+  });
 };
 
 module.exports = {

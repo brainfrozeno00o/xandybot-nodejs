@@ -11,10 +11,9 @@ module.exports = {
       const botPresenceDataList = await readJsonFile("data/presence-data.json");
 
       botPresenceDataList.forEach((presenceData) => {
-        const botPresenceData = generatePresenceData(
-          presenceData.status,
-          presenceData.activities
-        );
+        const botPresenceData = generatePresenceData(presenceData.status, {
+          activities: presenceData.activities,
+        });
 
         cron.schedule(presenceData.cron, async function() {
           await client.user.setPresence(botPresenceData);
